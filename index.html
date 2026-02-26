@@ -45,6 +45,9 @@
   <!-- Phase notification toast -->
   <div id="phase-toast"></div>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 1: HERO                             -->
+  <!-- ═══════════════════════════════════════════ -->
   <section id="hero">
     <div class="gradient-mesh">
       <div class="mesh-orb orb-1"></div>
@@ -53,6 +56,7 @@
       <div class="mesh-orb orb-4"></div>
     </div>
 
+    <!-- Floating project cards -->
     <div class="floating-cards" id="floating-cards">
       <div class="float-card fc-1"><span class="fc-num">01</span> AI Workflows</div>
       <div class="float-card fc-2"><span class="fc-num">02</span> Open Source</div>
@@ -62,10 +66,11 @@
       <div class="float-card fc-6"><span class="fc-num">06</span> Automation</div>
     </div>
 
+    <!-- Main hero content -->
     <div class="hero-content">
       <div class="hero-eyebrow">
         <span class="mono eyebrow-year">2026</span>
-        <span class="sep">&middot;</span>
+        <span class="sep">·</span>
         <span class="mono">37 projects</span>
       </div>
       <h1 class="hero-headline" id="hero-headline">
@@ -74,10 +79,12 @@
       <p class="hero-tagline">37 projects. One builder.</p>
     </div>
 
+    <!-- Scroll indicator -->
     <div class="scroll-indicator" id="scroll-indicator">
       <div class="scroll-line"></div>
     </div>
 
+    <!-- Bottom bar: braille progress + theme dots -->
     <div class="hero-bottom">
       <div class="braille-wrap">
         <span class="braille-label mono">BUILDING</span>
@@ -95,6 +102,9 @@
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 2: MANIFESTO                        -->
+  <!-- ═══════════════════════════════════════════ -->
   <section id="manifesto">
     <div class="manifesto-inner">
       <div class="manifesto-label mono">MANIFESTO</div>
@@ -102,23 +112,30 @@
         A builder working across AI, open source, data, and the web.
         Not confined to one lane — driven by curiosity and the compulsion to ship.
       </p>
-      <div class="manifesto-stats">
-        <div class="stat">
-          <span class="stat-number">37</span>
+      <div class="manifesto-stats" id="manifesto-stats">
+        <div class="stat stat-animated" data-step="1">
+          <span class="stat-number" id="stat-projects">37</span>
           <span class="stat-label mono">projects</span>
         </div>
-        <div class="stat">
-          <span class="stat-number">&infin;</span>
+        <div class="stat stat-animated" data-step="2">
+          <span class="stat-number" id="stat-ideas">&infin;</span>
           <span class="stat-label mono">ideas</span>
         </div>
-        <div class="stat">
-          <span class="stat-number">1</span>
+        <div class="stat stat-animated" data-step="3">
+          <span class="stat-number" id="stat-builder">1</span>
           <span class="stat-label mono">builder</span>
+        </div>
+        <div class="stat stat-animated stat-friends" data-step="4">
+          <span class="stat-number" id="stat-friends">0</span>
+          <span class="stat-label mono" id="stat-friends-label"></span>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 3: EVERYTHING CONNECTS              -->
+  <!-- ═══════════════════════════════════════════ -->
   <section id="connects">
     <div class="connects-inner">
       <h2 class="connects-title">Everything Connects</h2>
@@ -133,13 +150,32 @@
               <stop offset="100%" class="path-stop-3" />
             </linearGradient>
           </defs>
+          <!-- Ghost (background) path -->
           <path id="path-ghost"
-            d="M 400 30 C 700 30, 750 200, 400 300 C 50 400, 100 550, 400 600 C 700 650, 750 800, 400 900 C 50 1000, 100 1100, 400 1170"
-            fill="none" stroke-width="3" stroke-linecap="round" />
+            d="M 400 30
+               C 700 30, 750 200, 400 300
+               C 50 400, 100 550, 400 600
+               C 700 650, 750 800, 400 900
+               C 50 1000, 100 1100, 400 1170"
+            fill="none"
+            stroke-width="3"
+            stroke-linecap="round"
+          />
+          <!-- Animated fill path -->
           <path id="path-draw"
-            d="M 400 30 C 700 30, 750 200, 400 300 C 50 400, 100 550, 400 600 C 700 650, 750 800, 400 900 C 50 1000, 100 1100, 400 1170"
-            fill="none" stroke="url(#pathGrad)" stroke-width="4" stroke-linecap="round" />
+            d="M 400 30
+               C 700 30, 750 200, 400 300
+               C 50 400, 100 550, 400 600
+               C 700 650, 750 800, 400 900
+               C 50 1000, 100 1100, 400 1170"
+            fill="none"
+            stroke="url(#pathGrad)"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+          <!-- Traveling dot -->
           <circle id="path-dot" r="8" />
+          <!-- Labels -->
           <text class="path-label" x="560" y="65">AI Tools</text>
           <text class="path-label" x="60" y="310">Open Source</text>
           <text class="path-label" x="530" y="520">Data Analysis</text>
@@ -152,6 +188,9 @@
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 4: HOW I WORK                       -->
+  <!-- ═══════════════════════════════════════════ -->
   <section id="how-i-work">
     <div class="how-header">
       <span class="mono">PROCESS</span>
@@ -185,6 +224,9 @@
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 5: PROJECTS                         -->
+  <!-- ═══════════════════════════════════════════ -->
   <section id="projects">
     <div class="projects-header">
       <span class="mono">FEATURED WORK</span>
@@ -192,13 +234,14 @@
     </div>
 
     <div class="project-grid">
+      <!-- AI Workflows -->
       <article class="project-card reveal" data-dir="left">
         <div class="project-text">
           <span class="project-tag mono">01 / AI</span>
           <h3>Agent Workflows</h3>
           <p>Building autonomous pipelines that research, code, and ship. LLMs orchestrating LLMs — humans in the loop where it counts.</p>
           <div class="project-meta mono">
-            <span>Python</span><span class="meta-dot">&middot;</span><span>LangChain</span><span class="meta-dot">&middot;</span><span>OpenAI</span>
+            <span>Python</span><span class="meta-dot">·</span><span>LangChain</span><span class="meta-dot">·</span><span>OpenAI</span>
           </div>
         </div>
         <div class="project-visual ai-visual">
@@ -212,6 +255,7 @@
         </div>
       </article>
 
+      <!-- Open Source -->
       <article class="project-card reveal" data-dir="right">
         <div class="project-visual oss-visual">
           <div class="geo-oss" id="geo-oss"></div>
@@ -221,18 +265,19 @@
           <h3>Tools for Everyone</h3>
           <p>Contributing to the commons. Tools that anyone can use and extend. Open source as both practice and philosophy.</p>
           <div class="project-meta mono">
-            <span>GitHub</span><span class="meta-dot">&middot;</span><span>MIT License</span><span class="meta-dot">&middot;</span><span>Community</span>
+            <span>GitHub</span><span class="meta-dot">·</span><span>MIT License</span><span class="meta-dot">·</span><span>Community</span>
           </div>
         </div>
       </article>
 
+      <!-- Data & Visualization -->
       <article class="project-card reveal" data-dir="left">
         <div class="project-text">
           <span class="project-tag mono">03 / DATA</span>
           <h3>Data &amp; Visualization</h3>
           <p>Making sense of housing markets, economic trends, and complex datasets. Numbers become stories become decisions.</p>
           <div class="project-meta mono">
-            <span>Python</span><span class="meta-dot">&middot;</span><span>D3.js</span><span class="meta-dot">&middot;</span><span>PostgreSQL</span>
+            <span>Python</span><span class="meta-dot">·</span><span>D3.js</span><span class="meta-dot">·</span><span>PostgreSQL</span>
           </div>
         </div>
         <div class="project-visual data-visual">
@@ -251,6 +296,7 @@
         </div>
       </article>
 
+      <!-- Web Infrastructure -->
       <article class="project-card reveal" data-dir="right">
         <div class="project-visual web-visual">
           <div class="geo-web">
@@ -264,13 +310,16 @@
           <h3>Web Infrastructure</h3>
           <p>Domains, DNS, deployment pipelines — the plumbing of the internet. Making complex systems feel effortless.</p>
           <div class="project-meta mono">
-            <span>Cloudflare</span><span class="meta-dot">&middot;</span><span>AWS</span><span class="meta-dot">&middot;</span><span>DNS</span>
+            <span>Cloudflare</span><span class="meta-dot">·</span><span>AWS</span><span class="meta-dot">·</span><span>DNS</span>
           </div>
         </div>
       </article>
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 6: CTA                              -->
+  <!-- ═══════════════════════════════════════════ -->
   <section id="cta">
     <div class="cta-inner">
       <p class="cta-eyebrow mono">READY?</p>
@@ -284,6 +333,9 @@
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECTION 7: FOOTER                           -->
+  <!-- ═══════════════════════════════════════════ -->
   <footer id="footer">
     <div class="footer-inner">
       <div class="footer-left">

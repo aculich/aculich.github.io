@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initHowSteps();
   initManifestoReveal();
   initManifestoStats();
+  initScrollWhispers();
   initRevealCards();
   initSVGPath();
   initOSSGraph();
@@ -653,17 +654,13 @@ function showMischiefToast() {
 
 // ─────────────────────────────────────────────────
 // MANIFESTO STATS — Animated sequence
-// 37 → ∞ → 1, pause, then 0 appears → morphs to 37 "friends"
-// then 37^∞ exponentiation reveal
+// ∞ ideas → 1 builder → 0 alone → then 37^∞ reveal
 // ─────────────────────────────────────────────────
 function initManifestoStats() {
   const statsContainer = document.getElementById('manifesto-stats');
   if (!statsContainer) return;
 
   const stats = statsContainer.querySelectorAll('.stat-animated');
-  const friendsStat = statsContainer.querySelector('.stat-friends');
-  const friendsNum = document.getElementById('stat-friends');
-  const friendsLabel = document.getElementById('stat-friends-label');
   const expSection = document.getElementById('manifesto-exp');
   let hasAnimated = false;
 
@@ -672,7 +669,7 @@ function initManifestoStats() {
       if (entry.isIntersecting && !hasAnimated) {
         hasAnimated = true;
         observer.unobserve(entry.target);
-        runStatsSequence(stats, friendsStat, friendsNum, friendsLabel, expSection);
+        runStatsSequence(stats, expSection);
       }
     });
   }, { threshold: 0.3 });
@@ -680,38 +677,40 @@ function initManifestoStats() {
   observer.observe(statsContainer);
 }
 
-async function runStatsSequence(stats, friendsStat, friendsNum, friendsLabel, expSection) {
-  // Step 1: Reveal "37 projects"
-  await wait(200);
-  stats[0].classList.add('visible');
+async function runStatsSequence(stats, expSection) {
+  // Step 1: Reveal "∞ ideas"
+  await wait(300);
+  if (stats[0]) stats[0].classList.add('visible');
 
-  // Step 2: Reveal "∞ ideas"
-  await wait(400);
-  stats[1].classList.add('visible');
+  // Step 2: Reveal "1 builder"
+  await wait(500);
+  if (stats[1]) stats[1].classList.add('visible');
 
-  // Step 3: Reveal "1 builder"
-  await wait(400);
-  stats[2].classList.add('visible');
+  // Step 3: Reveal "0 alone" — a beat of stillness
+  await wait(800);
+  if (stats[2]) stats[2].classList.add('visible');
 
-  // Step 4: Pause, then "0" fades in — "not alone"
-  await wait(1200);
-  stats[3].classList.add('visible');
-
-  // Step 5: After a beat, "0" morphs into "37" with "friends" label
-  await wait(1800);
-  friendsStat.classList.add('morphing');
-
-  await wait(150);
-  friendsNum.textContent = '37';
-
-  await wait(450);
-  friendsStat.classList.remove('morphing');
-  friendsStat.classList.add('morphed');
-  friendsLabel.textContent = 'friends';
-
-  // Step 6: After friends settle, reveal the exponentiation 37^∞
-  await wait(1200);
+  // Step 4: After a longer pause, reveal the exponentiation 37^∞
+  await wait(1500);
   if (expSection) {
     expSection.classList.add('visible');
   }
+}
+
+// ─────────────────────────────────────────────────
+// SCROLL WHISPERS — manifesto fragments
+// ─────────────────────────────────────────────────
+function initScrollWhispers() {
+  const whispers = document.querySelectorAll('.scroll-whisper');
+  if (!whispers.length) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.4, rootMargin: '0px 0px -60px 0px' });
+
+  whispers.forEach(w => observer.observe(w));
 }

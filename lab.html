@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="garden">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab — Sequence Variations</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;0,900;1,400;1,700&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" />
+
+  <style>
+    /* ── Inherit Phase Shift theme tokens ── */
+    :root, [data-theme="garden"] {
+      --bg: #faf8f5;
+      --bg-rgb: 250, 248, 245;
+      --text: #271a00;
+      --text-rgb: 39, 26, 0;
+      --accent: #5a7247;
+      --accent-rgb: 90, 114, 71;
+      --highlight: #c4a35a;
+      --highlight-rgb: 196, 163, 90;
+      --muted: #8a7d6a;
+      --card-bg: rgba(255,255,255,0.6);
+      --card-border: rgba(90,114,71,0.12);
+    }
+
+    [data-theme="ocean"] {
+      --bg: #0a1628;
+      --bg-rgb: 10, 22, 40;
+      --text: #c8e6ff;
+      --text-rgb: 200, 230, 255;
+      --accent: #00d4ff;
+      --accent-rgb: 0, 212, 255;
+      --highlight: #ff6b6b;
+      --highlight-rgb: 255, 107, 107;
+      --muted: #6a9ab8;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(0,212,255,0.15);
+    }
+
+    [data-theme="geometry"] {
+      --bg: #f0f0f0;
+      --bg-rgb: 240, 240, 240;
+      --text: #1a1a2e;
+      --text-rgb: 26, 26, 46;
+      --accent: #7c3aed;
+      --accent-rgb: 124, 58, 237;
+      --highlight: #f59e0b;
+      --highlight-rgb: 245, 158, 11;
+      --muted: #6b6b8a;
+      --card-bg: rgba(124,58,237,0.05);
+      --card-border: rgba(124,58,237,0.12);
+    }
+
+    [data-theme="urban"] {
+      --bg: #121212;
+      --bg-rgb: 18, 18, 18;
+      --text: #faf0e6;
+      --text-rgb: 250, 240, 230;
+      --accent: #ff6600;
+      --accent-rgb: 255, 102, 0;
+      --highlight: #00aaff;
+      --highlight-rgb: 0, 170, 255;
+      --muted: #888880;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,102,0,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Header ── */
+    .lab-header {
+      padding: 3rem 2.5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .lab-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .lab-header h1 span {
+      color: var(--accent);
+    }
+
+    .lab-sub {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .lab-back {
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .lab-back:hover { color: var(--accent); }
+
+    /* ── Theme switcher ── */
+    .lab-controls {
+      padding: 0 2.5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .theme-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.9rem;
+      border-radius: 100px;
+      border: 1px solid var(--card-border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .theme-pill:hover { border-color: var(--accent); color: var(--text); }
+    .theme-pill.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    /* ── Grid ── */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 0 2.5rem 5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── Variation Card ── */
+    .var-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 2rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.35s,
+                  border-color 0.35s,
+                  background 0.4s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .var-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(var(--text-rgb), 0.08);
+      border-color: var(--accent);
+    }
+
+    .var-card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--accent);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .var-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    /* ── Sequence display ── */
+    .var-sequence {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      padding: 1.2rem 0;
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+      min-height: 80px;
+    }
+
+    .seq-item {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+      transition: color 0.3s;
+    }
+
+    .seq-item.large { font-size: 2.4rem; }
+    .seq-item.medium { font-size: 1.6rem; }
+    .seq-item.small { font-size: 1rem; opacity: 0.7; }
+    .seq-item.highlight-color { color: var(--highlight); }
+    .seq-item.text-color { color: var(--text); }
+    .seq-item.muted-color { color: var(--muted); }
+
+    .seq-arrow {
+      font-size: 0.8rem;
+      color: var(--muted);
+      opacity: 0.4;
+    }
+
+    .seq-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    /* Superscript */
+    .seq-sup {
+      font-size: 0.55em;
+      position: relative;
+      top: -0.5em;
+      color: var(--highlight);
+    }
+
+    .var-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+
+    /* ── Footer ── */
+    .lab-footer {
+      padding: 2rem 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+    }
+
+    .lab-footer p {
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .lab-grid { grid-template-columns: 1fr; padding: 0 1.5rem 4rem; }
+      .lab-header { padding: 2rem 1.5rem 1.5rem; }
+      .lab-controls { padding: 0 1.5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="lab-header">
+    <div>
+      <h1><span>37</span><sup style="font-size:0.6em; color:var(--highlight);">&infin;</sup> Lab</h1>
+      <p class="lab-sub mono">8 ways the sequence could go</p>
+    </div>
+    <a href="./index.html" class="lab-back mono">&larr; Back to site</a>
+  </header>
+
+  <div class="lab-controls">
+    <button class="theme-pill active mono" data-theme="garden">Garden</button>
+    <button class="theme-pill mono" data-theme="ocean">Ocean</button>
+    <button class="theme-pill mono" data-theme="geometry">Geometry</button>
+    <button class="theme-pill mono" data-theme="urban">Urban</button>
+  </div>
+
+  <div class="lab-grid">
+
+    <!-- Variation 1: The Countdown -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 01</span>
+      <h3 class="var-card-title">The Countdown</h3>
+      <div class="var-sequence">
+        <span class="seq-item large">37</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large highlight-color">&infin;</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large">1</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large text-color">0</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large">37<span class="seq-sup">&infin;</span></span>
+      </div>
+      <p class="var-desc">Classic sequence. Projects collapse to infinity, distill to one, hit zero — then explode exponentially.</p>
+    </div>
+
+    <!-- Variation 2: The Accumulator -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 02</span>
+      <h3 class="var-card-title">The Accumulator</h3>
+      <div class="var-sequence">
+        <span class="seq-item medium">1</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">1</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">2</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">3</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">5</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large highlight-color">37<span class="seq-sup">&infin;</span></span>
+      </div>
+      <p class="var-desc">Fibonacci energy. Small beginnings compound into something unreasonable. The gap between 5 and 37<sup>&infin;</sup> is the leap of faith.</p>
+    </div>
+
+    <!-- Variation 3: The Minimalist -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 03</span>
+      <h3 class="var-card-title">The Minimalist</h3>
+      <div class="var-sequence">
+        <span class="seq-item large muted-color">0</span>
+        <span class="seq-arrow" style="margin: 0 1.2rem;">&rarr;</span>
+        <span class="seq-item large">37<span class="seq-sup">&infin;</span></span>
+      </div>
+      <p class="var-desc">Nothing, then everything. Just two states. The quiet before exponential creation.</p>
+    </div>
+
+    <!-- Variation 4: The Loop -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 04</span>
+      <h3 class="var-card-title">The Loop</h3>
+      <div class="var-sequence">
+        <span class="seq-item medium">&infin;</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">1</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">0</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">&infin;</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large highlight-color">37<span class="seq-sup">&infin;</span></span>
+      </div>
+      <p class="var-desc">Infinity cycles through reduction and rebirth. The sequence repeats — then transcends itself.</p>
+    </div>
+
+    <!-- Variation 5: The Binary -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 05</span>
+      <h3 class="var-card-title">The Binary</h3>
+      <div class="var-sequence">
+        <span class="seq-item medium text-color">0</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium text-color">1</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium text-color">0</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium text-color">1</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large highlight-color">&infin;</span>
+      </div>
+      <p class="var-desc">On/off, on/off — then the switch breaks and the signal becomes infinite. Digital meets transcendent.</p>
+    </div>
+
+    <!-- Variation 6: The Primes -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 06</span>
+      <h3 class="var-card-title">The Primes</h3>
+      <div class="var-sequence">
+        <span class="seq-item small">2</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item small">3</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item small">5</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item small">7</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item small">…</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large">37<span class="seq-sup">&infin;</span></span>
+      </div>
+      <p class="var-desc">37 is the 12th prime. Primes are irreducible — just like the work. The sequence terminates at the only number that matters.</p>
+    </div>
+
+    <!-- Variation 7: The Gravity Well -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 07</span>
+      <h3 class="var-card-title">The Gravity Well</h3>
+      <div class="var-sequence">
+        <span class="seq-item small muted-color">&infin;</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item small muted-color">999</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">100</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item medium">37</span>
+        <span class="seq-arrow">&rarr;</span>
+        <span class="seq-item large highlight-color">1</span>
+      </div>
+      <p class="var-desc">Everything collapses inward. Infinite possibilities narrow to 37, then to one singular focus. Constraint as superpower.</p>
+    </div>
+
+    <!-- Variation 8: The Whisper -->
+    <div class="var-card">
+      <span class="var-card-num mono">VAR 08</span>
+      <h3 class="var-card-title">The Whisper</h3>
+      <div class="var-sequence" style="flex-direction: column; gap: 0.4rem; align-items: flex-start;">
+        <span class="seq-label">ideas</span>
+        <span class="seq-item large highlight-color">&infin;</span>
+        <span class="seq-label" style="margin-top: 0.5rem;">builder</span>
+        <span class="seq-item large">1</span>
+        <span class="seq-label" style="margin-top: 0.5rem;">alone</span>
+        <span class="seq-item large text-color">0</span>
+      </div>
+      <p class="var-desc">No arrows. No sequence. Just three truths stacked quietly. The 37<sup>&infin;</sup> is implied — you feel it without seeing it.</p>
+    </div>
+
+  </div>
+
+  <footer class="lab-footer">
+    <p class="mono">Phase Shift &middot; Lab</p>
+  </footer>
+
+  <script>
+    // Theme switching
+    document.querySelectorAll('.theme-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.theme-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.documentElement.setAttribute('data-theme', btn.dataset.theme);
+      });
+    });
+
+    // Staggered card entrance
+    const cards = document.querySelectorAll('.var-card');
+    cards.forEach((card, i) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(24px)';
+      card.style.transition = `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.08}s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.08}s`;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

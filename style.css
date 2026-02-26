@@ -686,33 +686,30 @@ em {
   transform: translateY(0);
 }
 
-.stat-friends {
+.stat-zero {
   position: relative;
 }
 
-.stat-friends .stat-number {
+.stat-zero .stat-number {
   transition: color 0.4s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.stat-friends.morphing .stat-number {
-  animation: morphPulse 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+/* (morphing removed — stats are now static reveals) */
+
+/* Exp link styling */
+.exp-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes morphPulse {
-  0%   { transform: scale(1); }
-  30%  { transform: scale(1.3); filter: blur(2px); }
-  100% { transform: scale(1); filter: blur(0); }
+.exp-link:hover {
+  transform: scale(1.06);
 }
 
-.stat-friends .stat-label {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
-}
-
-.stat-friends.morphed .stat-label {
-  opacity: 1;
-  transform: translateY(0);
+.exp-link:hover .exp-base {
+  color: var(--highlight);
 }
 
 /* Exponentiation reveal */
@@ -1548,4 +1545,45 @@ em {
 @keyframes teaserDotBlink {
   0%, 100% { opacity: 0.2; transform: scale(0.8); }
   50%      { opacity: 0.6; transform: scale(1.2); }
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLL WHISPERS
+   Manifesto fragments sprinkled between sections
+   ═══════════════════════════════════════════════ */
+.scroll-whisper {
+  position: relative;
+  z-index: 5;
+  background: var(--bg);
+  padding: 4rem 2.5rem;
+  text-align: center;
+  overflow: hidden;
+  transition: background 0.6s;
+}
+
+.scroll-whisper[data-align="left"]  { text-align: left; }
+.scroll-whisper[data-align="right"] { text-align: right; }
+
+.scroll-whisper p {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  max-width: 780px;
+  margin: 0 auto;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.4s;
+}
+
+.scroll-whisper[data-align="left"] p  { margin: 0 auto 0 0; padding-left: 8%; }
+.scroll-whisper[data-align="right"] p { margin: 0 0 0 auto; padding-right: 8%; }
+
+.scroll-whisper.visible p {
+  opacity: 0.55;
+  transform: translateY(0);
 }

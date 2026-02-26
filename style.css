@@ -481,12 +481,61 @@ em {
   transition: color 0.4s;
 }
 
+.pronoun-wrap {
+  position: relative;
+  display: inline-block;
+  margin-right: 0.1em;
+}
+
 .word-i {
   color: var(--accent);
   font-style: italic;
   font-weight: 400;
   font-size: 0.85em;
-  transition: color 0.4s;
+  transition: opacity 0.8s ease, color 0.4s;
+  position: relative;
+  display: inline-block;
+}
+
+/* Strikethrough line that animates across I */
+.word-i.striking::after {
+  content: '';
+  position: absolute;
+  left: -0.05em;
+  right: -0.05em;
+  top: 50%;
+  height: 2px;
+  background: var(--highlight);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: strikeAcross 0.6s ease forwards;
+}
+
+@keyframes strikeAcross {
+  to { transform: scaleX(1); }
+}
+
+.word-i.fading {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+/* "We" that emerges beside/replacing I */
+.word-we-emerge {
+  color: var(--accent);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.85em;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  white-space: nowrap;
+}
+
+.word-we-emerge.visible {
+  opacity: 1;
 }
 
 .cycling-word {

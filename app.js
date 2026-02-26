@@ -154,6 +154,26 @@ function startRAF() {
 function onScroll(scroll) {
   updateNavStyle(scroll);
   updateSVGPath(scroll);
+  updateHeroPhase(scroll);
+}
+
+function updateHeroPhase(scroll) {
+  const threshold = window.innerHeight * 0.35;
+  const iPhase = document.querySelector('.hero-i-phase');
+  const wePhase = document.querySelector('.hero-we-phase');
+  const tagline = document.getElementById('hero-tagline');
+
+  if (!iPhase || !wePhase) return;
+
+  if (scroll > threshold) {
+    iPhase.classList.add('is-hidden');
+    wePhase.classList.add('is-visible');
+    if (tagline) tagline.textContent = '37 projects. Never alone.';
+  } else {
+    iPhase.classList.remove('is-hidden');
+    wePhase.classList.remove('is-visible');
+    if (tagline) tagline.textContent = '37 projects. One builder.';
+  }
 }
 
 function updateNavStyle(scroll) {

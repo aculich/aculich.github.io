@@ -16,8 +16,12 @@ let currentTheme = 0;
 
 // ── CYCLING WORDS ─────────────────────────────────
 const WORDS = ['Build', 'Research', 'Create', 'Design', 'Ship', 'Explore', 'Automate', 'Connect'];
+const CO_WORDS = ['Co\u2011Build', 'Co\u2011Research', 'Co\u2011Create', 'Co\u2011Design', 'Co\u2011Ship', 'Co\u2011Explore', 'Co\u2011Automate', 'Co\u2011Connect'];
 let wordIndex = 0;
 let wordCycleTimer = null;
+let cycleCount = 0;
+const TRANSITION_AT = 3; // After this many full cycles, start I→We transition
+let pronounTransitioned = false;
 
 // ── BRAILLE CHARS ─────────────────────────────────
 const BRAILLE = ['⠀', '⠄', '⠆', '⠇', '⠧', '⠷', '⠿'];
@@ -285,16 +289,57 @@ function renderWord(container, word) {
   });
 }
 
+function triggerPronounTransition() {
+  if (pronounTransitioned) return;
+  pronounTransitioned = true;
+
+  const wordI = document.getElementById('word-i');
+  const wordWe = document.getElementById('word-we-emerge');
+
+  if (!wordI || !wordWe) return;
+
+  // Step 1: Strikethrough the "I"
+  wordI.classList.add('striking');
+
+  // Step 2: After strike completes, show "We" and fade "I"
+  setTimeout(() => {
+    wordWe.classList.add('visible');
+    wordI.classList.add('fading');
+  }, 700);
+
+  // Step 3: After "I" fully fades, remove it from flow
+  setTimeout(() => {
+    wordI.style.width = '0';
+    wordI.style.overflow = 'hidden';
+    wordI.style.margin = '0';
+    wordI.style.padding = '0';
+    // Make "We" position relative now that I is gone
+    wordWe.style.position = 'relative';
+  }, 2000);
+}
+
 function scheduleNextWord(container) {
   wordCycleTimer = setTimeout(() => {
     wordIndex = (wordIndex + 1) % WORDS.length;
+
+    // Track full cycles
+    if (wordIndex === 0) cycleCount++;
+
+    // Determine which word list to use
+    const useCoWords = cycleCount >= TRANSITION_AT;
+    const currentWords = useCoWords ? CO_WORDS : WORDS;
+
+    // Trigger the I→We transition at the moment we switch to Co-words
+    if (useCoWords && !pronounTransitioned) {
+      triggerPronounTransition();
+    }
 
     // Exit animation
     container.classList.add('exit');
     const exitDelay = 350;
 
     setTimeout(() => {
-      renderWord(container, WORDS[wordIndex]);
+      renderWord(container, currentWords[wordIndex]);
     }, exitDelay);
 
     scheduleNextWord(container);

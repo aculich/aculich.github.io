@@ -24,7 +24,7 @@ const BRAILLE = ['⠀', '⠄', '⠆', '⠇', '⠧', '⠷', '⠿'];
 const BRAILLE_SEGS = 28;
 let brailleTimer = null;
 
-// ── STATE ───────────────────────────────────────
+// ── STATE ─────────────────────────────────────────
 let fog = null;
 let lenis = null;
 
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPhaseShift();
   initHowSteps();
   initManifestoReveal();
+  initManifestoStats();
   initRevealCards();
   initSVGPath();
   initOSSGraph();
@@ -84,7 +85,7 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ── FOG DISSOLVE ─────────────────────────────────
+// ── FOG DISSOLVE ──────────────────────────────────
 function initFog() {
   const canvas = document.getElementById('fog-canvas');
   fog = new FogDissolve(canvas);
@@ -111,7 +112,7 @@ function initLenis() {
   });
 }
 
-// ── RAF LOOP ───────────────────────────────────────
+// ── RAF LOOP ──────────────────────────────────────
 function startRAF() {
   function raf(time) {
     if (lenis) lenis.raf(time);
@@ -473,4 +474,61 @@ function initNavScroll() {
       }
     });
   });
+}
+
+// ─────────────────────────────────────────────────
+// MANIFESTO STATS — Animated sequence
+// 37 → ∞ → 1, pause, then 0 appears → morphs to 37 "friends"
+// ─────────────────────────────────────────────────
+function initManifestoStats() {
+  const statsContainer = document.getElementById('manifesto-stats');
+  if (!statsContainer) return;
+
+  const stats = statsContainer.querySelectorAll('.stat-animated');
+  const friendsStat = statsContainer.querySelector('.stat-friends');
+  const friendsNum = document.getElementById('stat-friends');
+  const friendsLabel = document.getElementById('stat-friends-label');
+  let hasAnimated = false;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !hasAnimated) {
+        hasAnimated = true;
+        observer.unobserve(entry.target);
+        runStatsSequence(stats, friendsStat, friendsNum, friendsLabel);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  observer.observe(statsContainer);
+}
+
+async function runStatsSequence(stats, friendsStat, friendsNum, friendsLabel) {
+  // Step 1: Reveal "37 projects"
+  await wait(200);
+  stats[0].classList.add('visible');
+
+  // Step 2: Reveal "∞ ideas"
+  await wait(400);
+  stats[1].classList.add('visible');
+
+  // Step 3: Reveal "1 builder"
+  await wait(400);
+  stats[2].classList.add('visible');
+
+  // Step 4: Pause, then "0" fades in — "not alone"
+  await wait(1200);
+  stats[3].classList.add('visible');
+
+  // Step 5: After a beat, "0" morphs into "37" with "friends" label
+  await wait(1800);
+  friendsStat.classList.add('morphing');
+
+  await wait(150);
+  friendsNum.textContent = '37';
+
+  await wait(450);
+  friendsStat.classList.remove('morphing');
+  friendsStat.classList.add('morphed');
+  friendsLabel.textContent = 'friends';
 }

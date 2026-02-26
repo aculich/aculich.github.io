@@ -479,6 +479,7 @@ function initNavScroll() {
 // ─────────────────────────────────────────────────
 // MANIFESTO STATS — Animated sequence
 // 37 → ∞ → 1, pause, then 0 appears → morphs to 37 "friends"
+// then 37^∞ exponentiation reveal
 // ─────────────────────────────────────────────────
 function initManifestoStats() {
   const statsContainer = document.getElementById('manifesto-stats');
@@ -488,6 +489,7 @@ function initManifestoStats() {
   const friendsStat = statsContainer.querySelector('.stat-friends');
   const friendsNum = document.getElementById('stat-friends');
   const friendsLabel = document.getElementById('stat-friends-label');
+  const expSection = document.getElementById('manifesto-exp');
   let hasAnimated = false;
 
   const observer = new IntersectionObserver((entries) => {
@@ -495,7 +497,7 @@ function initManifestoStats() {
       if (entry.isIntersecting && !hasAnimated) {
         hasAnimated = true;
         observer.unobserve(entry.target);
-        runStatsSequence(stats, friendsStat, friendsNum, friendsLabel);
+        runStatsSequence(stats, friendsStat, friendsNum, friendsLabel, expSection);
       }
     });
   }, { threshold: 0.3 });
@@ -503,7 +505,7 @@ function initManifestoStats() {
   observer.observe(statsContainer);
 }
 
-async function runStatsSequence(stats, friendsStat, friendsNum, friendsLabel) {
+async function runStatsSequence(stats, friendsStat, friendsNum, friendsLabel, expSection) {
   // Step 1: Reveal "37 projects"
   await wait(200);
   stats[0].classList.add('visible');
@@ -531,4 +533,10 @@ async function runStatsSequence(stats, friendsStat, friendsNum, friendsLabel) {
   friendsStat.classList.remove('morphing');
   friendsStat.classList.add('morphed');
   friendsLabel.textContent = 'friends';
+
+  // Step 6: After friends settle, reveal the exponentiation 37^∞
+  await wait(1200);
+  if (expSection) {
+    expSection.classList.add('visible');
+  }
 }

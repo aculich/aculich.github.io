@@ -24,6 +24,31 @@ const BRAILLE = ['⠀', '⠄', '⠆', '⠇', '⠧', '⠷', '⠿'];
 const BRAILLE_SEGS = 28;
 let brailleTimer = null;
 
+// ── MISCHIEF CONFIG ───────────────────────────────
+const MISCHIEF = {
+  dwellMin: 2800,       // Minimum hover time before it *might* trigger (ms)
+  dwellMax: 6000,       // Max additional random delay on top of min
+  cooldownMin: 12000,   // Min cooldown between quadrant shifts
+  cooldownMax: 25000,   // Max additional random cooldown
+  shuffleEvery: 3,      // Re-shuffle quadrant→theme map every N triggers
+  jitterRadius: 0.08,   // How much the quadrant boundaries wobble (0-0.15)
+  reluctance: 0.35,     // Probability of *refusing* to shift even when conditions are met
+};
+
+let mischiefState = {
+  quadrantMap: [0, 1, 2, 3],  // Which quadrant maps to which theme — gets shuffled
+  lastShift: 0,               // Timestamp of last quadrant-triggered shift
+  triggerCount: 0,             // How many quadrant shifts have occurred
+  currentQuadrant: -1,         // Which quadrant the mouse is in
+  dwellStart: 0,               // When mouse entered current quadrant
+  dwellTimer: null,            // Timer for the delayed trigger
+  cooldownUntil: 0,            // Don't trigger until this timestamp
+  jitterOffsetX: 0,            // Current boundary jitter
+  jitterOffsetY: 0,
+  isActive: true,              // Mischief can be paused
+  cursorHint: false,           // Whether we've shown the subtle cursor hint
+};
+
 // ── STATE ─────────────────────────────────────────
 let fog = null;
 let lenis = null;
@@ -42,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSVGPath();
   initOSSGraph();
   initNavScroll();
+  initMischief();
   startRAF();
 
   // Page load sequence
@@ -474,6 +500,155 @@ function initNavScroll() {
       }
     });
   });
+}
+
+// ─────────────────────────────────────────────────
+// MISCHIEVOUS QUADRANT HOVER
+// The page watches where your mouse lingers.
+// If you dwell in one quadrant long enough, it
+// *might* decide to shift the theme. But not always.
+// And the mapping between quadrants and themes
+// shuffles periodically, so you can't memorize it.
+// ─────────────────────────────────────────────────
+function initMischief() {
+  // Shuffle the initial quadrant map
+  shuffleQuadrantMap();
+  // Randomize initial boundary jitter
+  wobbleBoundaries();
+
+  document.addEventListener('mousemove', onMischiefMove);
+  document.addEventListener('mouseleave', onMischiefLeave);
+}
+
+function shuffleQuadrantMap() {
+  // Fisher-Yates shuffle
+  const arr = [0, 1, 2, 3];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  mischiefState.quadrantMap = arr;
+}
+
+function wobbleBoundaries() {
+  const jr = MISCHIEF.jitterRadius;
+  mischiefState.jitterOffsetX = (Math.random() - 0.5) * 2 * jr;
+  mischiefState.jitterOffsetY = (Math.random() - 0.5) * 2 * jr;
+}
+
+function getQuadrant(clientX, clientY) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  // Boundaries wobble slightly so the quadrants aren't perfectly centered
+  const cx = (0.5 + mischiefState.jitterOffsetX) * vw;
+  const cy = (0.5 + mischiefState.jitterOffsetY) * vh;
+  
+  if (clientX < cx && clientY < cy) return 0; // top-left
+  if (clientX >= cx && clientY < cy) return 1; // top-right
+  if (clientX < cx && clientY >= cy) return 2; // bottom-left
+  return 3; // bottom-right
+}
+
+function onMischiefMove(e) {
+  if (!mischiefState.isActive) return;
+  if (fog && fog.transitioning) return;
+  
+  const quadrant = getQuadrant(e.clientX, e.clientY);
+  
+  if (quadrant !== mischiefState.currentQuadrant) {
+    // Entered a new quadrant — reset dwell
+    mischiefState.currentQuadrant = quadrant;
+    mischiefState.dwellStart = Date.now();
+    clearTimeout(mischiefState.dwellTimer);
+    
+    // Set a new timer with randomized delay
+    const delay = MISCHIEF.dwellMin + Math.random() * MISCHIEF.dwellMax;
+    mischiefState.dwellTimer = setTimeout(() => {
+      attemptMischiefShift(quadrant);
+    }, delay);
+  }
+}
+
+function onMischiefLeave() {
+  mischiefState.currentQuadrant = -1;
+  clearTimeout(mischiefState.dwellTimer);
+}
+
+function attemptMischiefShift(quadrant) {
+  const now = Date.now();
+  
+  // Check cooldown
+  if (now < mischiefState.cooldownUntil) return;
+  
+  // Check if still in same quadrant
+  if (quadrant !== mischiefState.currentQuadrant) return;
+  
+  // Check if fog is busy
+  if (fog && fog.transitioning) return;
+  
+  // Roll for reluctance — sometimes it just refuses
+  if (Math.random() < MISCHIEF.reluctance) {
+    // Refused! But give a tiny visual hint that something *almost* happened
+    showMischiefGhost();
+    // Try again with a shorter delay
+    mischiefState.dwellTimer = setTimeout(() => {
+      attemptMischiefShift(quadrant);
+    }, 1500 + Math.random() * 2000);
+    return;
+  }
+  
+  // Determine target theme from quadrant map
+  const targetTheme = mischiefState.quadrantMap[quadrant];
+  
+  // Don't shift to the same theme
+  if (targetTheme === currentTheme) {
+    // Wobble the boundaries and try a different mapping next time
+    wobbleBoundaries();
+    return;
+  }
+  
+  // Execute the shift!
+  mischiefState.triggerCount++;
+  mischiefState.lastShift = now;
+  
+  // Set cooldown
+  const cooldown = MISCHIEF.cooldownMin + Math.random() * MISCHIEF.cooldownMax;
+  mischiefState.cooldownUntil = now + cooldown;
+  
+  // Every N triggers, reshuffle the map so they can't predict it
+  if (mischiefState.triggerCount % MISCHIEF.shuffleEvery === 0) {
+    shuffleQuadrantMap();
+    wobbleBoundaries();
+  }
+  
+  // Shift with a playful toast
+  jumpToTheme(targetTheme);
+  showMischiefToast();
+}
+
+function showMischiefGhost() {
+  // A barely-perceptible flicker — the page almost shifted but changed its mind
+  const ghost = document.getElementById('mischief-ghost');
+  if (!ghost) return;
+  ghost.classList.add('flicker');
+  setTimeout(() => ghost.classList.remove('flicker'), 600);
+}
+
+function showMischiefToast() {
+  const phrases = [
+    'Did the light just change?',
+    'Hmm.',
+    'You lingered.',
+    'Phase drift detected.',
+    'The page noticed you.',
+    'Curious, isn\'t it?',
+    '…was that you?',
+    'Something shifted.',
+    'Pay attention.',
+    'Not everything stays.',
+  ];
+  const msg = phrases[Math.floor(Math.random() * phrases.length)];
+  showPhaseToast(msg);
 }
 
 // ─────────────────────────────────────────────────

@@ -1423,3 +1423,129 @@ em {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ═══════════════════════════════════════════════
+   MISCHIEF GHOST
+   A barely-perceptible screen flicker when
+   the page almost shifts but changes its mind
+   ═══════════════════════════════════════════════ */
+#mischief-ghost {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  pointer-events: none;
+  opacity: 0;
+  background: var(--accent);
+  mix-blend-mode: overlay;
+  transition: opacity 0.15s ease;
+}
+
+#mischief-ghost.flicker {
+  animation: ghostFlicker 0.6s ease-out;
+}
+
+@keyframes ghostFlicker {
+  0%   { opacity: 0; }
+  15%  { opacity: 0.04; }
+  30%  { opacity: 0; }
+  45%  { opacity: 0.025; }
+  60%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════
+   TEASER — "Something is brewing"
+   Subtle cafe teaser before footer
+   ═══════════════════════════════════════════════ */
+#teaser {
+  position: relative;
+  background: var(--bg);
+  padding: 6rem 2.5rem;
+  z-index: 5;
+  text-align: center;
+  border-top: 1px solid var(--card-border);
+  transition: background 0.6s;
+  overflow: hidden;
+}
+
+/* Subtle ambient warmth behind the teaser */
+#teaser::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--highlight) 0%, transparent 70%);
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.teaser-inner {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.teaser-glyph {
+  margin-bottom: 2rem;
+}
+
+.teaser-counter {
+  font-size: 2.5rem;
+  color: var(--accent);
+  display: inline-block;
+  animation: teaserPulse 4s ease-in-out infinite;
+  transition: color 0.4s;
+  opacity: 0.7;
+}
+
+@keyframes teaserPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+
+.teaser-text {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.teaser-sub {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--text);
+  opacity: 0.5;
+  margin-bottom: 2rem;
+  transition: color 0.4s;
+}
+
+.teaser-dots {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.teaser-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.4;
+  animation: teaserDotBlink 3s ease-in-out infinite;
+  transition: background 0.4s;
+}
+
+.teaser-dot:nth-child(2) {
+  animation-delay: 1.5s;
+  background: var(--highlight);
+}
+
+@keyframes teaserDotBlink {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%      { opacity: 0.6; transform: scale(1.2); }
+}

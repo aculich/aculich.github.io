@@ -20,7 +20,7 @@ const CO_WORDS = ['Co\u2011Build', 'Co\u2011Research', 'Co\u2011Create', 'Co\u20
 let wordIndex = 0;
 let wordCycleTimer = null;
 let cycleCount = 0;
-const TRANSITION_AT = 3; // After this many full cycles, start I→We transition
+const TRANSITION_AT = 1; // After this many full cycles, start I→We transition
 let pronounTransitioned = false;
 
 // ── BRAILLE CHARS ─────────────────────────────────

@@ -1,1 +1,1601 @@
-PLAYGROUND_FULL
+<!DOCTYPE html>
+<html lang="en" data-theme="garden">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>37∞ Playground — The Other Side</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;0,900;1,400;1,700&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" />
+
+  <style>
+    /* ── Theme tokens (same as lab, softer in playground) ── */
+    :root, [data-theme="garden"] {
+      --bg: #faf8f5; --bg-rgb: 250, 248, 245;
+      --text: #271a00; --text-rgb: 39, 26, 0;
+      --accent: #5a7247; --accent-rgb: 90, 114, 71;
+      --highlight: #c4a35a; --highlight-rgb: 196, 163, 90;
+      --muted: #8a7d6a;
+      --card-bg: rgba(255,255,255,0.6);
+      --card-border: rgba(90,114,71,0.12);
+    }
+    [data-theme="ocean"] {
+      --bg: #0a1628; --bg-rgb: 10, 22, 40;
+      --text: #c8e6ff; --text-rgb: 200, 230, 255;
+      --accent: #00d4ff; --accent-rgb: 0, 212, 255;
+      --highlight: #ff6b6b; --highlight-rgb: 255, 107, 107;
+      --muted: #6a9ab8;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(0,212,255,0.15);
+    }
+    [data-theme="geometry"] {
+      --bg: #f0f0f0; --bg-rgb: 240, 240, 240;
+      --text: #1a1a2e; --text-rgb: 26, 26, 46;
+      --accent: #7c3aed; --accent-rgb: 124, 58, 237;
+      --highlight: #f59e0b; --highlight-rgb: 245, 158, 11;
+      --muted: #6b6b8a;
+      --card-bg: rgba(124,58,237,0.05);
+      --card-border: rgba(124,58,237,0.12);
+    }
+    [data-theme="urban"] {
+      --bg: #121212; --bg-rgb: 18, 18, 18;
+      --text: #faf0e6; --text-rgb: 250, 240, 230;
+      --accent: #ff6600; --accent-rgb: 255, 102, 0;
+      --highlight: #00aaff; --highlight-rgb: 0, 170, 255;
+      --muted: #888880;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,102,0,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.8s, color 0.8s;
+      overflow-x: hidden;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      position: relative;
+    }
+
+    /* ── Grain overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
+
+    /* ── Full-page canvas background ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.12;
+    }
+
+    /* ── Main content wrapper ── */
+    .pg-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Stressed state ── */
+    body.stressed .pg-wrap {
+      animation: stress-shake 0.08s infinite;
+    }
+    @keyframes stress-shake {
+      0%   { transform: translate(0,0) rotate(0deg); }
+      25%  { transform: translate(-1px, 1px) rotate(0.1deg); }
+      50%  { transform: translate(1px, -1px) rotate(-0.1deg); }
+      75%  { transform: translate(-1px, -1px) rotate(0.05deg); }
+      100% { transform: translate(1px, 1px) rotate(0deg); }
+    }
+
+    /* ── Header portal ── */
+    .portal-header {
+      padding: 4rem 2.5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      max-width: 780px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Return link */
+    .return-lab {
+      position: fixed;
+      top: 1.8rem;
+      left: 2rem;
+      z-index: 100;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      opacity: 0;
+      transition: opacity 0.4s, color 0.3s;
+    }
+    .return-lab:hover { color: var(--accent); opacity: 1 !important; }
+    .portal-header:hover ~ * .return-lab,
+    body:hover .return-lab { opacity: 0.4; }
+
+    /* The 37∞ breathing symbol */
+    .portal-glyph {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--accent);
+      line-height: 1;
+      animation: breathe 4s ease-in-out infinite;
+      position: relative;
+      cursor: default;
+      user-select: none;
+    }
+    .portal-glyph sup {
+      font-size: 0.45em;
+      color: var(--highlight);
+      position: relative;
+      top: -0.3em;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.9; filter: blur(0px); }
+      50% { transform: scale(1.04); opacity: 1; filter: blur(0px); }
+    }
+    body.stressed .portal-glyph {
+      animation: breathe-stressed 0.3s ease-in-out infinite;
+    }
+    @keyframes breathe-stressed {
+      0%, 100% { transform: scale(1) rotate(-1deg); filter: blur(1px); opacity: 0.8; }
+      50% { transform: scale(1.06) rotate(1deg); filter: blur(0.5px); opacity: 1; }
+    }
+    body.still .portal-glyph {
+      animation: breathe-slow 6s ease-in-out infinite;
+    }
+    @keyframes breathe-slow {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.07); opacity: 1; }
+    }
+
+    .portal-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 560px;
+      transition: filter 0.5s, opacity 0.5s;
+      opacity: 0.85;
+    }
+    body.stressed .portal-subtitle {
+      filter: blur(1.5px);
+      opacity: 0.7;
+    }
+
+    /* ── Theme switcher (corner dots) ── */
+    .theme-corner {
+      position: fixed;
+      top: 1.8rem;
+      right: 2rem;
+      z-index: 100;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: transform 0.3s, border-color 0.2s;
+    }
+    .theme-dot:hover { transform: scale(1.35); }
+    .theme-dot.active { border-color: var(--text); transform: scale(1.2); }
+    .theme-dot[data-theme="garden"] { background: #5a7247; }
+    .theme-dot[data-theme="ocean"]  { background: #00d4ff; }
+    .theme-dot[data-theme="geometry"] { background: #7c3aed; }
+    .theme-dot[data-theme="urban"]  { background: #ff6600; }
+
+    /* ── Rosetta constellation ── */
+    .constellation-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 2.5rem 5rem;
+      position: relative;
+    }
+
+    .constellation-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      color: var(--accent);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+      opacity: 0.75;
+    }
+    .constellation-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .constellation-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 3rem;
+      line-height: 1.7;
+    }
+
+    /* The floating fragment grid */
+    .constellation-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr;
+      gap: 0;
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 40px rgba(var(--text-rgb), 0.04), 0 0 0 1px var(--card-border);
+    }
+
+    .c-fragment {
+      padding: 1.1rem 1.3rem;
+      border: 1px solid var(--card-border);
+      border-right: none;
+      border-bottom: none;
+      background: rgba(var(--bg-rgb), 0.55);
+      backdrop-filter: blur(6px);
+      transition: background 0.4s, transform 0.5s cubic-bezier(0.2,1,0.3,1), border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+      cursor: default;
+    }
+    .c-fragment:nth-child(5n) { border-right: 1px solid var(--card-border); }
+    .c-row:last-child .c-fragment { border-bottom: 1px solid var(--card-border); }
+    .c-fragment.header-frag {
+      background: rgba(var(--accent-rgb), 0.055);
+    }
+    .c-fragment.row-label-frag {
+      background: rgba(var(--accent-rgb), 0.03);
+    }
+    .c-fragment:hover {
+      background: rgba(var(--accent-rgb), 0.08);
+      box-shadow: 0 2px 12px rgba(var(--accent-rgb), 0.08);
+      z-index: 2;
+    }
+
+    .c-frag-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.44rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.35rem;
+      opacity: 0.8;
+    }
+    .c-frag-main {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+      font-style: italic;
+    }
+    .c-frag-sub {
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 0.3rem;
+      font-weight: 300;
+    }
+
+    /* Personal band */
+    .personal-band {
+      margin-top: 3rem;
+      padding: 2rem;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      background: rgba(var(--highlight-rgb), 0.03);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      backdrop-filter: blur(8px);
+      position: relative;
+    }
+    .personal-band::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(var(--highlight-rgb),0.04), rgba(var(--accent-rgb),0.03));
+      pointer-events: none;
+    }
+    .pb-item { display: flex; flex-direction: column; gap: 0.3rem; }
+    .pb-symbol {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--highlight);
+      line-height: 1;
+      animation: glow-pulse 3s ease-in-out infinite;
+    }
+    .pb-item:nth-child(2) .pb-symbol { animation-delay: 0.75s; }
+    .pb-item:nth-child(3) .pb-symbol { animation-delay: 1.5s; }
+    .pb-item:nth-child(4) .pb-symbol { animation-delay: 2.25s; }
+    @keyframes glow-pulse {
+      0%,100% { opacity: 0.75; text-shadow: none; }
+      50% { opacity: 1; text-shadow: 0 0 14px rgba(var(--highlight-rgb),0.4); }
+    }
+    .pb-arrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+    .pb-concept {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      font-style: italic;
+    }
+    .pb-note {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    /* ── Divider ── */
+    .river-divider {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .river-divider-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+      opacity: 0.75;
+    }
+    .river-divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    /* ── River of variations ── */
+    .river {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2.5rem 6rem;
+      columns: 2;
+      column-gap: 3rem;
+    }
+    @media (max-width: 780px) {
+      .river { columns: 1; padding: 0 1.5rem 5rem; }
+    }
+
+    /* ── Variation fragment (poem stanza) ── */
+    .vf {
+      break-inside: avoid;
+      margin-bottom: 3.5rem;
+      position: relative;
+      transition: filter 0.4s, opacity 0.4s;
+    }
+    body.stressed .vf {
+      filter: blur(0.4px);
+    }
+    body.fast-mouse .vf:hover {
+      filter: blur(0.8px);
+      transform: translate(var(--scatter-x, 0), var(--scatter-y, 0));
+    }
+
+    .vf-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.6rem;
+      opacity: 0.7;
+    }
+
+    .vf-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 0.9rem;
+      transition: letter-spacing 0.5s;
+    }
+    body.stressed .vf-title {
+      letter-spacing: 0.03em;
+    }
+
+    /* Formula — soft, watercolor-like */
+    .vf-formula {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: var(--muted);
+      opacity: 0.55;
+      margin-bottom: 1rem;
+      transform: rotate(-0.4deg);
+      display: inline-block;
+      transition: opacity 0.5s, filter 0.5s;
+      letter-spacing: 0.04em;
+    }
+    body.contemplative .vf-formula {
+      opacity: 0.8;
+      filter: none;
+    }
+    body.stressed .vf-formula {
+      opacity: 0.3;
+      filter: blur(0.8px);
+    }
+
+    /* Description with shimmerable technical words */
+    .vf-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.85;
+      font-weight: 300;
+      position: relative;
+    }
+    body.contemplative .vf-desc {
+      color: var(--text);
+      opacity: 0.85;
+    }
+
+    /* Shimmerable technical words */
+    .shimmer-word {
+      cursor: help;
+      position: relative;
+      transition: color 0.3s, text-shadow 0.3s, background 0.3s;
+      border-bottom: 1px dotted rgba(var(--accent-rgb), 0.35);
+      padding-bottom: 1px;
+    }
+    .shimmer-word:hover {
+      color: var(--accent);
+      text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.25);
+      background: rgba(var(--accent-rgb), 0.05);
+      border-radius: 2px;
+    }
+    .shimmer-word .poetic-equiv {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(8px);
+      border-radius: 6px;
+      padding: 0.3rem 0.7rem;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.75rem;
+      color: var(--accent);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 10;
+      margin-bottom: 6px;
+      transform: translateX(-50%) translateY(4px);
+    }
+    .shimmer-word:hover .poetic-equiv {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Fragment divider line */
+    .vf::before {
+      content: '';
+      display: block;
+      width: 2.5rem;
+      height: 1px;
+      background: var(--card-border);
+      margin-bottom: 1.5rem;
+      transition: width 0.6s, background-color 0.5s;
+    }
+    body.contemplative .vf::before { width: 5rem; background: rgba(var(--accent-rgb),0.3); }
+
+    /* ── Ripple canvas ── */
+    #ripple-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0.6;
+    }
+
+    /* ── Footer ── */
+    .pg-footer {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 3rem 2.5rem 4rem;
+      text-align: center;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .pg-footer-quote {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 480px;
+    }
+    .pg-footer-quote strong { color: var(--accent); font-style: normal; }
+    .portal-back-glyph {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--card-border);
+      padding: 0.6rem 1.2rem;
+      border-radius: 100px;
+      transition: color 0.3s, border-color 0.3s, background 0.3s;
+    }
+    .portal-back-glyph:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.06);
+    }
+
+    /* ── Scroll parallax containers ── */
+    .parallax-slow { will-change: transform; }
+    .parallax-fast { will-change: transform; }
+
+    /* ── Dissolve states (applied via JS on click) ── */
+    .dissolving .vf-title {
+      animation: dissolve-shimmer 0.6s ease forwards;
+    }
+    @keyframes dissolve-shimmer {
+      0%   { opacity: 1; filter: blur(0); }
+      40%  { opacity: 0.3; filter: blur(2px); letter-spacing: 0.1em; }
+      100% { opacity: 1; filter: blur(0); }
+    }
+
+    /* ── Background gradient animation ── */
+    .bg-gradient-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.12;
+      background: radial-gradient(ellipse 60% 50% at var(--gx, 50%) var(--gy, 40%),
+        rgba(var(--accent-rgb), 0.6), transparent 70%),
+        radial-gradient(ellipse 40% 40% at var(--gx2, 70%) var(--gy2, 70%),
+        rgba(var(--highlight-rgb), 0.4), transparent 60%);
+      transition: opacity 0.8s;
+      animation: gradient-drift 12s ease-in-out infinite alternate;
+    }
+    @keyframes gradient-drift {
+      0%   { --gx: 30%; --gy: 30%; --gx2: 70%; --gy2: 65%; }
+      33%  { --gx: 60%; --gy: 45%; --gx2: 40%; --gy2: 75%; }
+      66%  { --gx: 45%; --gy: 65%; --gx2: 70%; --gy2: 40%; }
+      100% { --gx: 55%; --gy: 35%; --gx2: 35%; --gy2: 60%; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 760px) {
+      .constellation-grid { grid-template-columns: 1.1fr 1fr 1fr; }
+      .c-fragment:nth-child(n+4):not(.show-mobile) { display: none; }
+      .personal-band { grid-template-columns: repeat(2, 1fr); }
+      .constellation-wrap, .river-divider { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .portal-header { padding: 3rem 1.5rem 2rem; }
+      .pg-footer { padding: 2rem 1.5rem 3rem; }
+    }
+    @media (max-width: 500px) {
+      .personal-band { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── Velocity indicator (subtle) ── */
+    .velocity-aura {
+      position: fixed;
+      top: 0; left: 0;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(var(--accent-rgb), 0.08), transparent 70%);
+      pointer-events: none;
+      z-index: 40;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.3s, width 0.2s, height 0.2s;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background layers -->
+  <div class="bg-gradient-layer"></div>
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="ripple-canvas"></canvas>
+  <div class="velocity-aura" id="vel-aura"></div>
+
+  <!-- Fixed nav elements -->
+  <a href="./lab.html" class="return-lab" target="_blank" rel="noopener noreferrer">← return to the lab</a>
+
+  <div class="theme-corner">
+    <button class="theme-dot active" data-theme="garden" title="Garden" aria-label="Garden theme"></button>
+    <button class="theme-dot" data-theme="ocean" title="Ocean" aria-label="Ocean theme"></button>
+    <button class="theme-dot" data-theme="geometry" title="Geometry" aria-label="Geometry theme"></button>
+    <button class="theme-dot" data-theme="urban" title="Urban" aria-label="Urban theme"></button>
+  </div>
+
+  <!-- Main content -->
+  <div class="pg-wrap">
+
+    <!-- 1. Entry Header -->
+    <header class="portal-header">
+      <div class="portal-glyph" id="portal-glyph">37<sup>&infin;</sup></div>
+      <p class="portal-subtitle">
+        You've stepped through the grid. Welcome to the other side.
+      </p>
+    </header>
+
+    <!-- 2. Mirror Rosetta Constellation -->
+    <section class="constellation-wrap parallax-slow" data-parallax="0.15">
+      <p class="constellation-label">The Mirror Rosetta</p>
+      <h2 class="constellation-title">The skeleton beneath all four languages</h2>
+      <p class="constellation-sub">The same abstract shapes, spoken differently. Here is where they meet — where the grammar of truth and the dream of machines and the flow of things and the survival of structure discover they've been saying the same thing all along.</p>
+
+      <div class="constellation-grid">
+        <!-- Header row -->
+        <div class="c-row" style="display:contents;">
+          <div class="c-fragment header-frag">
+            <span class="c-frag-label">The skeleton beneath</span>
+            <div class="c-frag-main">The structure under all four</div>
+            <div class="c-frag-sub">The abstract form beneath every language</div>
+          </div>
+          <div class="c-fragment header-frag">
+            <span class="c-frag-label">How things flow</span>
+            <div class="c-frag-main">Systems &amp; Currents</div>
+            <div class="c-frag-sub">Where energy and matter travel</div>
+          </div>
+          <div class="c-fragment header-frag">
+            <span class="c-frag-label">What survives bending</span>
+            <div class="c-frag-main">Shapes &amp; Deformations</div>
+            <div class="c-frag-sub">What doesn't change when you stretch it</div>
+          </div>
+          <div class="c-fragment header-frag">
+            <span class="c-frag-label">The grammar of truth</span>
+            <div class="c-frag-main">Statements &amp; Evidence</div>
+            <div class="c-frag-sub">The architecture of what holds</div>
+          </div>
+          <div class="c-fragment header-frag">
+            <span class="c-frag-label">What machines dream</span>
+            <div class="c-frag-main">Shapes &amp; Instructions</div>
+            <div class="c-frag-sub">The territory of the computable</div>
+          </div>
+        </div>
+
+        <!-- Objects row -->
+        <div class="c-row" style="display:contents;">
+          <div class="c-fragment row-label-frag">
+            <span class="c-frag-label">Things that exist</span>
+            <div class="c-frag-main">Objects</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Systems</div>
+            <div class="c-frag-sub">Configurations in time</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Spaces</div>
+            <div class="c-frag-sub">Territories with shape</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Propositions</div>
+            <div class="c-frag-sub">What can be said</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Data Types</div>
+            <div class="c-frag-sub">The possible, made formal</div>
+          </div>
+        </div>
+
+        <!-- Morphisms row -->
+        <div class="c-row" style="display:contents;">
+          <div class="c-fragment row-label-frag">
+            <span class="c-frag-label">Directed moves</span>
+            <div class="c-frag-main">Paths from A to B</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Processes</div>
+            <div class="c-frag-sub">How one state becomes another</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Skins that join</div>
+            <div class="c-frag-sub">Surfaces connecting what was separate</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Proofs</div>
+            <div class="c-frag-sub">Evidence that bridges claims</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Programs</div>
+            <div class="c-frag-sub">What carries one shape into another</div>
+          </div>
+        </div>
+
+        <!-- Composition row -->
+        <div class="c-row" style="display:contents;">
+          <div class="c-fragment row-label-frag">
+            <span class="c-frag-label">Small steps, then leaps</span>
+            <div class="c-frag-main">Chaining</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Sequence</div>
+            <div class="c-frag-sub">One after another</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Gluing at the edge</div>
+            <div class="c-frag-sub">Where two surfaces share a boundary</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Syllogism</div>
+            <div class="c-frag-sub">If A then B, if B then C</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">g ∘ f : A → C</div>
+            <div class="c-frag-sub">Function chaining</div>
+          </div>
+        </div>
+
+        <!-- Tensor row -->
+        <div class="c-row" style="display:contents;">
+          <div class="c-fragment row-label-frag">
+            <span class="c-frag-label">Ideas, braided</span>
+            <div class="c-frag-main">Parallel &amp; Woven</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Side-by-side</div>
+            <div class="c-frag-sub">Two processes, run together</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Richer fabric</div>
+            <div class="c-frag-sub">Spaces placed next to each other</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Both &amp; And</div>
+            <div class="c-frag-sub">Holding two truths at once</div>
+          </div>
+          <div class="c-fragment">
+            <div class="c-frag-main">Pairs, Tuples</div>
+            <div class="c-frag-sub">Carrying things together</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal band -->
+      <div class="personal-band">
+        <div class="pb-item">
+          <span class="pb-symbol">◦</span>
+          <span class="pb-arrow">things that exist →</span>
+          <span class="pb-concept">Projects</span>
+          <span class="pb-note">The 37 things we build — each a distinct space with its own shape and boundary</span>
+        </div>
+        <div class="pb-item">
+          <span class="pb-symbol">→</span>
+          <span class="pb-arrow">paths from A to B →</span>
+          <span class="pb-concept">Collaborations</span>
+          <span class="pb-note">How projects transform through people — every partnership, a skin that joins two states</span>
+        </div>
+        <div class="pb-item">
+          <span class="pb-symbol">∘</span>
+          <span class="pb-arrow">small steps then leaps →</span>
+          <span class="pb-concept">Portfolio</span>
+          <span class="pb-note">Each project glued to the next, forming a larger shape you couldn't plan in advance</span>
+        </div>
+        <div class="pb-item">
+          <span class="pb-symbol">⊗</span>
+          <span class="pb-arrow">ideas, braided →</span>
+          <span class="pb-concept">Co-creation</span>
+          <span class="pb-note">Not 1+1 but 1⊗1 — a richer object, woven from what each alone could never become</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. The River of Variations -->
+    <div class="river-divider">
+      <span class="river-divider-label">The River of Variations</span>
+      <div class="river-divider-line"></div>
+      <span class="river-divider-label" style="opacity:0.4;">01 — 24</span>
+    </div>
+
+    <div class="river parallax-fast" data-parallax="0.05" id="river">
+
+      <!-- 01 -->
+      <div class="vf" data-var="01">
+        <span class="vf-num">01</span>
+        <h3 class="vf-title">The Letting Go</h3>
+        <div class="vf-formula">37 → ∞ → 1 → 0 → 37∞</div>
+        <p class="vf-desc">Classic <span class="shimmer-word">sequence<span class="poetic-equiv">journey</span></span>. Ideas multiply to infinity, distill to one clear vision, hit zero ego — then we build something that outlasts us.</p>
+      </div>
+
+      <!-- 02 -->
+      <div class="vf" data-var="02">
+        <span class="vf-num">02</span>
+        <h3 class="vf-title">The Gathering</h3>
+        <div class="vf-formula">1 → 1 → 2 → 3 → 5 → 37∞</div>
+        <p class="vf-desc">Fibonacci energy. Small <span class="shimmer-word">collaborations<span class="poetic-equiv">braided threads</span></span> compound into something unreasonable. The gap between 5 and 37∞ is the leap we take together.</p>
+      </div>
+
+      <!-- 03 -->
+      <div class="vf" data-var="03">
+        <span class="vf-num">03</span>
+        <h3 class="vf-title">The Silence Before</h3>
+        <div class="vf-formula">0 → 37∞</div>
+        <p class="vf-desc">Nothing, then everything. Just two states. The quiet before <span class="shimmer-word">co-creation<span class="poetic-equiv">ideas braided</span></span> begins.</p>
+      </div>
+
+      <!-- 04 -->
+      <div class="vf" data-var="04">
+        <span class="vf-num">04</span>
+        <h3 class="vf-title">The Eternal Return</h3>
+        <div class="vf-formula">∞ → 1 → 0 → ∞ → 37∞</div>
+        <p class="vf-desc">Infinity cycles through reduction and rebirth. The <span class="shimmer-word">sequence<span class="poetic-equiv">the path</span></span> repeats — then transcends itself.</p>
+      </div>
+
+      <!-- 05 -->
+      <div class="vf" data-var="05">
+        <span class="vf-num">05</span>
+        <h3 class="vf-title">The Switch That Broke</h3>
+        <div class="vf-formula">0 → 1 → 0 → 1 → ∞</div>
+        <p class="vf-desc">On/off, on/off — then the switch breaks and the signal becomes infinite. <span class="shimmer-word">Digital<span class="poetic-equiv">binary</span></span> meets transcendent.</p>
+      </div>
+
+      <!-- 06 -->
+      <div class="vf" data-var="06">
+        <span class="vf-num">06</span>
+        <h3 class="vf-title">The Irreducibles</h3>
+        <div class="vf-formula">2 → 3 → 5 → 7 → … → 37∞</div>
+        <p class="vf-desc">37 is the 12th <span class="shimmer-word">prime<span class="poetic-equiv">irreducible</span></span>. Primes are irreducible — just like the work. The sequence terminates at the only number that matters.</p>
+      </div>
+
+      <!-- 07 -->
+      <div class="vf" data-var="07">
+        <span class="vf-num">07</span>
+        <h3 class="vf-title">The Collapse Inward</h3>
+        <div class="vf-formula">∞ → 999 → 100 → 37 → 1</div>
+        <p class="vf-desc">Everything collapses inward. Infinite possibilities narrow to 37, then to one singular <span class="shimmer-word">focus<span class="poetic-equiv">fixed point</span></span>. Constraint as superpower.</p>
+      </div>
+
+      <!-- 08 -->
+      <div class="vf" data-var="08">
+        <span class="vf-num">08</span>
+        <h3 class="vf-title">Three Truths, Stacked</h3>
+        <div class="vf-formula">ideas:∞ / builders:∞ / alone:0</div>
+        <p class="vf-desc">No arrows. No <span class="shimmer-word">sequence<span class="poetic-equiv">journey</span></span>. Just three truths stacked quietly. Infinite builders, zero alone — the 37∞ emerges from community.</p>
+      </div>
+
+      <!-- 09 -->
+      <div class="vf" data-var="09">
+        <span class="vf-num">09</span>
+        <h3 class="vf-title">Abundance Through Constraint</h3>
+        <div class="vf-formula">∞³⁷</div>
+        <p class="vf-desc">∞³⁷ — What if infinite possibilities are shaped by 37 <span class="shimmer-word">constraints<span class="poetic-equiv">boundaries</span></span>? Abundance channeled through experience. The inverse of explosion is focus.</p>
+      </div>
+
+      <!-- 10 -->
+      <div class="vf" data-var="10">
+        <span class="vf-num">10</span>
+        <h3 class="vf-title">The Directed Move</h3>
+        <div class="vf-formula">37 →f ∞</div>
+        <p class="vf-desc">An arrow between objects. Every project is a <span class="shimmer-word">morphism<span class="poetic-equiv">directed move</span></span> — a transformation from what is to what could be. The arrow itself is the work.</p>
+      </div>
+
+      <!-- 11 -->
+      <div class="vf" data-var="11">
+        <span class="vf-num">11</span>
+        <h3 class="vf-title">The Skin That Joins</h3>
+        <div class="vf-formula">∂M = (○ ○) ⊔ ○</div>
+        <p class="vf-desc">Two separate efforts fuse into one. A <span class="shimmer-word">cobordism<span class="poetic-equiv">skin that joins</span></span> is a surface connecting boundaries. It's how collaborations merge into something neither could become alone.</p>
+      </div>
+
+      <!-- 12 -->
+      <div class="vf" data-var="12">
+        <span class="vf-num">12</span>
+        <h3 class="vf-title">The Lens</h3>
+        <div class="vf-formula">F(37) = ∞</div>
+        <p class="vf-desc">A <span class="shimmer-word">functor<span class="poetic-equiv">faithful lens</span></span> preserves structure while changing perspective. Apply the right lens, and finite projects reveal infinite patterns. The map itself is the insight.</p>
+      </div>
+
+      <!-- 13 -->
+      <div class="vf" data-var="13">
+        <span class="vf-num">13</span>
+        <h3 class="vf-title">The Soft Shutter</h3>
+        <div class="vf-formula">η : F ⟹ G</div>
+        <p class="vf-desc">A <span class="shimmer-word">natural transformation<span class="poetic-equiv">soft shutter</span></span>: a way to shift between worldviews while keeping everything coherent. The same work, seen through different eyes — and somehow both views are correct.</p>
+      </div>
+
+      <!-- 14 -->
+      <div class="vf" data-var="14">
+        <span class="vf-num">14</span>
+        <h3 class="vf-title">Ideas, Braided</h3>
+        <div class="vf-formula">37 ⊗ ∞</div>
+        <p class="vf-desc">When two ideas combine, they don't just add — they multiply across every dimension. The <span class="shimmer-word">tensor product<span class="poetic-equiv">richer fabric</span></span> of effort and vision is more than either alone.</p>
+      </div>
+
+      <!-- 15 -->
+      <div class="vf" data-var="15">
+        <span class="vf-num">15</span>
+        <h3 class="vf-title">The Powerful Stillness</h3>
+        <div class="vf-formula">id₃₇ : 37 → 37</div>
+        <p class="vf-desc">Sometimes the most powerful move is to stay. The <span class="shimmer-word">identity<span class="poetic-equiv">powerful stillness</span></span>: being exactly what you are, fully. Not every transformation moves you somewhere else.</p>
+      </div>
+
+      <!-- 16 -->
+      <div class="vf" data-var="16">
+        <span class="vf-num">16</span>
+        <h3 class="vf-title">Small Steps, Then Leaps</h3>
+        <div class="vf-formula">g ∘ f : A → C</div>
+        <p class="vf-desc">Chain two transformations and skip the middle. <span class="shimmer-word">Composition<span class="poetic-equiv">chaining</span></span> is how small steps become leaps — and why the order in which we do things matters so deeply.</p>
+      </div>
+
+      <!-- 17 -->
+      <div class="vf" data-var="17">
+        <span class="vf-num">17</span>
+        <h3 class="vf-title">Mirror Tools</h3>
+        <div class="vf-formula">F ⊣ G</div>
+        <p class="vf-desc">Two processes that are <span class="shimmer-word">adjoint<span class="poetic-equiv">mirror tools</span></span> — mirror images of each other. Creating and reflecting. Building and understanding. Left and right sides of the same truth.</p>
+      </div>
+
+      <!-- 18 -->
+      <div class="vf" data-var="18">
+        <span class="vf-num">18</span>
+        <h3 class="vf-title">Where Change Rests</h3>
+        <div class="vf-formula">f(37∞) = 37∞</div>
+        <p class="vf-desc">Some things are self-sustaining. Apply the transformation and arrive right back where you started — but deeper. The <span class="shimmer-word">fixed point<span class="poetic-equiv">where change rests</span></span> is where change has finished its work.</p>
+      </div>
+
+      <!-- 19 -->
+      <div class="vf" data-var="19">
+        <span class="vf-num">19</span>
+        <h3 class="vf-title">The Shape That Emerges</h3>
+        <div class="vf-formula">lim(n→∞) 37ⁿ</div>
+        <p class="vf-desc">Every sequence of partial efforts converges somewhere. The <span class="shimmer-word">limit<span class="poetic-equiv">shape that emerges</span></span> is not a destination — it's the form that appears when you keep going, faithfully, step by step.</p>
+      </div>
+
+      <!-- 20 -->
+      <div class="vf" data-var="20">
+        <span class="vf-num">20</span>
+        <h3 class="vf-title">Every Fragment, Gathered</h3>
+        <div class="vf-formula">colim {P₁, P₂, …, P₃₇}</div>
+        <p class="vf-desc">Gather every fragment, every collaboration, every false start. The <span class="shimmer-word">colimit<span class="poetic-equiv">gathering of fragments</span></span> glues them into something none could be alone. This is what a portfolio actually is.</p>
+      </div>
+
+      <!-- 21 -->
+      <div class="vf" data-var="21">
+        <span class="vf-num">21</span>
+        <h3 class="vf-title">Deliberate Acceleration</h3>
+        <div class="vf-formula">∫₀ˢ e^(it²) dt</div>
+        <p class="vf-desc">A curve whose <span class="shimmer-word">curvature<span class="poetic-equiv">tightening</span></span> increases with distance. Start slow, build gradually, and the spiral tightens into something beautiful. The shape of deliberate acceleration.</p>
+      </div>
+
+      <!-- 22 -->
+      <div class="vf" data-var="22">
+        <span class="vf-num">22</span>
+        <h3 class="vf-title">Threads Into Fabric</h3>
+        <div class="vf-formula">σ₁σ₂σ₁ = σ₂σ₁σ₂</div>
+        <p class="vf-desc">Three strands cross and uncross, but the pattern holds. <span class="shimmer-word">Braiding<span class="poetic-equiv">weaving</span></span> is how separate threads of work weave into fabric that's stronger than any single thread.</p>
+      </div>
+
+      <!-- 23 -->
+      <div class="vf" data-var="23">
+        <span class="vf-num">23</span>
+        <h3 class="vf-title">Smoothly Becoming</h3>
+        <div class="vf-formula">H(x,0) = f(x), H(x,1) = g(x)</div>
+        <p class="vf-desc">A continuous <span class="shimmer-word">deformation<span class="poetic-equiv">becoming</span></span> from one path to another. You don't have to jump — you can smoothly become. Every transformation is a homotopy between who you were and who you are.</p>
+      </div>
+
+      <!-- 24 -->
+      <div class="vf" data-var="24">
+        <span class="vf-num">24</span>
+        <h3 class="vf-title">Where Work Meets World</h3>
+        <div class="vf-formula">∂(37∞) = community</div>
+        <p class="vf-desc">Every space has a <span class="shimmer-word">boundary<span class="poetic-equiv">where work meets world</span></span>. The boundary of this work is where it meets the world — the community that gives it meaning. ∂∂ = 0: the boundary of a boundary is empty. Only community remains.</p>
+      </div>
+
+    </div><!-- end .river -->
+
+    <!-- Footer -->
+    <footer class="pg-footer">
+      <p class="pg-footer-quote">
+        "The boundary of a boundary is empty.<br>
+        <strong>Only community remains.</strong>"
+      </p>
+      <a href="./lab.html" class="portal-back-glyph" target="_blank" rel="noopener noreferrer">
+        ⬡ return through the portal
+      </a>
+    </footer>
+
+  </div><!-- end .pg-wrap -->
+
+  <script>
+  (function() {
+    'use strict';
+
+    /* ══════════════════════════════════════════════════
+       THEME SYSTEM
+    ══════════════════════════════════════════════════ */
+    const root = document.documentElement;
+
+    // Read ?theme= param
+    const urlTheme = new URLSearchParams(window.location.search).get('theme');
+    const validThemes = ['garden', 'ocean', 'geometry', 'urban'];
+    const initialTheme = (validThemes.includes(urlTheme) ? urlTheme : 'garden');
+    root.setAttribute('data-theme', initialTheme);
+
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+      if (dot.dataset.theme === initialTheme) dot.classList.add('active');
+      else dot.classList.remove('active');
+    });
+
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        root.setAttribute('data-theme', dot.dataset.theme);
+        // Redraw bg canvas with new theme
+        drawBg();
+      });
+    });
+
+    function getCSSVar(name) {
+      return getComputedStyle(root).getPropertyValue(name).trim();
+    }
+
+    /* ══════════════════════════════════════════════════
+       BACKGROUND CANVAS — Topological Curves
+    ══════════════════════════════════════════════════ */
+    const bgCanvas = document.getElementById('bg-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let bgW, bgH, bgT = 0, bgRaf;
+
+    function resizeBg() {
+      bgW = bgCanvas.width = window.innerWidth;
+      bgH = bgCanvas.height = window.innerHeight;
+    }
+    resizeBg();
+    window.addEventListener('resize', resizeBg);
+
+    // Euler spiral utility
+    function eulerPoints(maxS, scale) {
+      const steps = 600;
+      const dt = maxS / steps;
+      let s = 0, x = 0, y = 0, angle = 0;
+      const pts = [[0, 0]];
+      for (let i = 0; i < steps; i++) {
+        angle += s * s * 0.1;
+        x += Math.cos(angle) * dt * scale;
+        y += Math.sin(angle) * dt * scale;
+        pts.push([x, y]);
+        s += dt;
+      }
+      return pts;
+    }
+
+    // Lissajous
+    function lissajousPoints(a, b, delta, scale, steps) {
+      const pts = [];
+      for (let i = 0; i <= steps; i++) {
+        const t = (i / steps) * Math.PI * 2;
+        pts.push([Math.cos(a * t + delta) * scale, Math.sin(b * t) * scale]);
+      }
+      return pts;
+    }
+
+    let mouseVelocity = 0;
+    let bgPhase = 0;
+
+    function drawBg() {
+      bgCtx.clearRect(0, 0, bgW, bgH);
+      const accent = getCSSVar('--accent');
+      const highlight = getCSSVar('--highlight');
+      const muted = getCSSVar('--muted');
+
+      // Velocity affects wildness — more velocity = wilder curves
+      const wildness = Math.min(mouseVelocity / 30, 1);
+      const calmness = 1 - wildness;
+
+      const cx = bgW / 2, cy = bgH / 2;
+
+      // Slowly evolving Euler spirals (pair, mirrored)
+      const spiralScale = Math.min(bgW, bgH) * 0.08 * (1 + wildness * 0.4);
+      const maxS = 5 + wildness * 3;
+      const pts = eulerPoints(maxS, spiralScale);
+
+      // Offset for animation
+      const ox = Math.sin(bgT * 0.04) * bgW * 0.08;
+      const oy = Math.cos(bgT * 0.03) * bgH * 0.06;
+
+      bgCtx.save();
+      bgCtx.translate(cx + ox, cy + oy);
+      bgCtx.beginPath();
+      pts.forEach(([x, y], i) => {
+        i === 0 ? bgCtx.moveTo(x, y) : bgCtx.lineTo(x, y);
+      });
+      bgCtx.strokeStyle = accent;
+      bgCtx.globalAlpha = 0.55 + wildness * 0.2;
+      bgCtx.lineWidth = 1;
+      bgCtx.stroke();
+
+      // Mirrored
+      bgCtx.save();
+      bgCtx.scale(-1, -1);
+      bgCtx.beginPath();
+      pts.forEach(([x, y], i) => {
+        i === 0 ? bgCtx.moveTo(x, y) : bgCtx.lineTo(x, y);
+      });
+      bgCtx.strokeStyle = highlight;
+      bgCtx.globalAlpha = 0.35 + wildness * 0.15;
+      bgCtx.lineWidth = 0.8;
+      bgCtx.stroke();
+      bgCtx.restore();
+      bgCtx.restore();
+
+      // Lissajous curves (2 of them at different positions)
+      const lissParams = [
+        { a: 3, b: 2, delta: bgT * 0.008, scale: Math.min(bgW, bgH) * 0.15, ox: bgW * 0.22, oy: bgH * 0.25, color: accent },
+        { a: 5, b: 4, delta: bgT * 0.006 + 1, scale: Math.min(bgW, bgH) * 0.1, ox: bgW * 0.78, oy: bgH * 0.75, color: highlight },
+      ];
+      lissParams.forEach(lp => {
+        const lpts = lissajousPoints(lp.a + wildness, lp.b + wildness * 0.5, lp.delta, lp.scale, 300);
+        bgCtx.save();
+        bgCtx.translate(lp.ox, lp.oy);
+        bgCtx.beginPath();
+        lpts.forEach(([x, y], i) => {
+          i === 0 ? bgCtx.moveTo(x, y) : bgCtx.lineTo(x, y);
+        });
+        bgCtx.strokeStyle = lp.color;
+        bgCtx.globalAlpha = 0.45 + wildness * 0.1;
+        bgCtx.lineWidth = 0.8;
+        bgCtx.stroke();
+        bgCtx.restore();
+      });
+
+      // Cobordism-style arcs (connecting boundary arcs)
+      for (let i = 0; i < 3; i++) {
+        const phase = (i / 3) * Math.PI * 2 + bgT * 0.015;
+        const rx = bgW * (0.25 + i * 0.25 + Math.sin(bgT * 0.02 + i) * 0.04);
+        const ry = bgH * (0.3 + i * 0.15 + Math.cos(bgT * 0.025 + i) * 0.04);
+        bgCtx.beginPath();
+        bgCtx.ellipse(rx, ry, 60 + wildness * 30, 30 + wildness * 15, phase * 0.2, 0, Math.PI * 2);
+        bgCtx.strokeStyle = i % 2 === 0 ? accent : muted;
+        bgCtx.globalAlpha = 0.2 + calmness * 0.1;
+        bgCtx.lineWidth = 0.6;
+        bgCtx.stroke();
+      }
+    }
+
+    function animateBg(ts) {
+      bgT = ts / 1000;
+      bgPhase = bgT;
+      drawBg();
+      bgRaf = requestAnimationFrame(animateBg);
+    }
+    bgRaf = requestAnimationFrame(animateBg);
+
+    /* ══════════════════════════════════════════════════
+       RIPPLE CANVAS
+    ══════════════════════════════════════════════════ */
+    const rippleCanvas = document.getElementById('ripple-canvas');
+    const ripCtx = rippleCanvas.getContext('2d');
+    let ripW, ripH;
+    const ripples = [];
+
+    function resizeRipple() {
+      ripW = rippleCanvas.width = window.innerWidth;
+      ripH = rippleCanvas.height = window.innerHeight;
+    }
+    resizeRipple();
+    window.addEventListener('resize', resizeRipple);
+
+    function addRipple(x, y) {
+      const accent = getCSSVar('--accent');
+      ripples.push({ x, y, r: 0, maxR: 160, opacity: 0.6, color: accent, born: performance.now() });
+    }
+
+    function animateRipples() {
+      ripCtx.clearRect(0, 0, ripW, ripH);
+      const now = performance.now();
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const rip = ripples[i];
+        const age = (now - rip.born) / 1200;
+        if (age >= 1) { ripples.splice(i, 1); continue; }
+        rip.r = rip.maxR * age;
+        const alpha = rip.opacity * (1 - age);
+        ripCtx.beginPath();
+        ripCtx.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
+        ripCtx.strokeStyle = rip.color;
+        ripCtx.globalAlpha = alpha;
+        ripCtx.lineWidth = 1.5;
+        ripCtx.stroke();
+        // Inner ripple
+        if (rip.r > 20) {
+          ripCtx.beginPath();
+          ripCtx.arc(rip.x, rip.y, rip.r * 0.55, 0, Math.PI * 2);
+          ripCtx.globalAlpha = alpha * 0.4;
+          ripCtx.lineWidth = 0.8;
+          ripCtx.stroke();
+        }
+      }
+      requestAnimationFrame(animateRipples);
+    }
+    animateRipples();
+
+    /* ══════════════════════════════════════════════════
+       MOUSE VELOCITY + STATE SYSTEM
+    ══════════════════════════════════════════════════ */
+    let lastX = 0, lastY = 0, lastTime = 0;
+    let velHistory = new Array(8).fill(0);
+    let velIdx = 0;
+    let stillTimer = null;
+    let stressClickCount = 0;
+    let stressTimer = null;
+    const velAura = document.getElementById('vel-aura');
+
+    const SLOW_THRESH = 4;
+    const FAST_THRESH = 25;
+
+    function computeVelocity(x, y, t) {
+      const dx = x - lastX, dy = y - lastY, dt = Math.max(t - lastTime, 1);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const vel = dist / dt * 16; // px/frame approx
+      velHistory[velIdx % velHistory.length] = vel;
+      velIdx++;
+      const avg = velHistory.reduce((a, b) => a + b, 0) / velHistory.length;
+      lastX = x; lastY = y; lastTime = t;
+      return avg;
+    }
+
+    let mouseMoveThrottle = null;
+
+    document.addEventListener('mousemove', e => {
+      if (mouseMoveThrottle) return;
+      mouseMoveThrottle = requestAnimationFrame(() => {
+        mouseMoveThrottle = null;
+        const vel = computeVelocity(e.clientX, e.clientY, performance.now());
+        mouseVelocity = vel;
+
+        // Move velocity aura
+        velAura.style.left = e.clientX + 'px';
+        velAura.style.top = e.clientY + 'px';
+
+        const body = document.body;
+
+        if (vel < SLOW_THRESH) {
+          body.classList.remove('fast-mouse');
+          body.classList.add('contemplative');
+          velAura.style.opacity = '0';
+          velAura.style.width = '120px';
+          velAura.style.height = '120px';
+        } else if (vel > FAST_THRESH) {
+          body.classList.add('fast-mouse');
+          body.classList.remove('contemplative');
+          velAura.style.opacity = '0.6';
+          velAura.style.width = Math.min(300, vel * 4) + 'px';
+          velAura.style.height = Math.min(300, vel * 4) + 'px';
+          // Distort nearby fragments
+          distortNearFragments(e.clientX, e.clientY, vel);
+        } else {
+          body.classList.remove('fast-mouse', 'contemplative');
+          velAura.style.opacity = '0.2';
+        }
+
+        // Reset still timer
+        body.classList.remove('still');
+        if (stillTimer) clearTimeout(stillTimer);
+        stillTimer = setTimeout(() => {
+          body.classList.add('still');
+          velAura.style.opacity = '0';
+        }, 3000);
+      });
+    });
+
+    function distortNearFragments(mx, my, vel) {
+      const frags = document.querySelectorAll('.c-fragment');
+      frags.forEach(frag => {
+        const rect = frag.getBoundingClientRect();
+        const fx = rect.left + rect.width / 2;
+        const fy = rect.top + rect.height / 2;
+        const dist = Math.sqrt((mx - fx) ** 2 + (my - fy) ** 2);
+        if (dist < 180) {
+          const push = (180 - dist) / 180 * Math.min(vel / 10, 12);
+          const angle = Math.atan2(fy - my, fx - mx);
+          const tx = Math.cos(angle) * push;
+          const ty = Math.sin(angle) * push;
+          frag.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)`;
+          frag.classList.add('repelling');
+          setTimeout(() => {
+            frag.style.transform = '';
+            frag.classList.remove('repelling');
+          }, 600);
+        }
+      });
+    }
+
+    /* ══════════════════════════════════════════════════
+       CLICK INTERACTIONS
+    ══════════════════════════════════════════════════ */
+    // Poetic dissolution map for titles
+    const poeticTitles = {
+      '01': 'The Letting Go',
+      '02': 'The Gathering',
+      '03': 'The Silence Before',
+      '04': 'The Eternal Return',
+      '05': 'The Switch That Broke',
+      '06': 'The Irreducibles',
+      '07': 'The Collapse Inward',
+      '08': 'Three Truths, Stacked',
+      '09': 'Abundance Through Constraint',
+      '10': 'The Directed Move',
+      '11': 'The Skin That Joins',
+      '12': 'The Lens',
+      '13': 'The Soft Shutter',
+      '14': 'Ideas, Braided',
+      '15': 'The Powerful Stillness',
+      '16': 'Small Steps, Then Leaps',
+      '17': 'Mirror Tools',
+      '18': 'Where Change Rests',
+      '19': 'The Shape That Emerges',
+      '20': 'Every Fragment, Gathered',
+      '21': 'Deliberate Acceleration',
+      '22': 'Threads Into Fabric',
+      '23': 'Smoothly Becoming',
+      '24': 'Where Work Meets World',
+    };
+
+    const techTitles = {
+      '01': 'The Countdown',
+      '02': 'The Accumulator',
+      '03': 'The Minimalist',
+      '04': 'The Loop',
+      '05': 'The Binary',
+      '06': 'The Primes',
+      '07': 'The Gravity Well',
+      '08': 'The Whisper',
+      '09': 'The Inversion',
+      '10': 'The Morphism',
+      '11': 'The Cobordism',
+      '12': 'The Functor',
+      '13': 'The Natural Transformation',
+      '14': 'The Tensor Product',
+      '15': 'The Identity',
+      '16': 'The Composition',
+      '17': 'The Adjunction',
+      '18': 'The Fixed Point',
+      '19': 'The Limit',
+      '20': 'The Colimit',
+      '21': 'The Euler Spiral',
+      '22': 'The Braid',
+      '23': 'The Homotopy',
+      '24': 'The Boundary',
+    };
+
+    // Track dissolved state
+    const dissolvedState = {};
+
+    document.addEventListener('click', e => {
+      // Ripple
+      addRipple(e.clientX, e.clientY);
+
+      // Stress counting
+      stressClickCount++;
+      if (stressTimer) clearTimeout(stressTimer);
+      stressTimer = setTimeout(() => { stressClickCount = 0; }, 2000);
+
+      if (stressClickCount >= 5) {
+        document.body.classList.add('stressed');
+        setTimeout(() => {
+          document.body.classList.remove('stressed');
+          stressClickCount = 0;
+        }, 1800);
+      }
+
+      // Dissolve nearest vf title
+      const vfs = document.querySelectorAll('.vf');
+      let nearest = null, nearestDist = Infinity;
+      vfs.forEach(vf => {
+        const rect = vf.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
+        if (dist < nearestDist) { nearestDist = dist; nearest = vf; }
+      });
+      if (nearest && nearestDist < 300) {
+        const varNum = nearest.dataset.var;
+        const titleEl = nearest.querySelector('.vf-title');
+        if (!titleEl) return;
+
+        nearest.classList.add('dissolving');
+        setTimeout(() => nearest.classList.remove('dissolving'), 700);
+
+        // Toggle between poetic and tech title
+        if (!dissolvedState[varNum]) {
+          dissolvedState[varNum] = 'tech';
+          titleEl.textContent = techTitles[varNum] || titleEl.textContent;
+        } else if (dissolvedState[varNum] === 'tech') {
+          dissolvedState[varNum] = 'poetic';
+          titleEl.textContent = poeticTitles[varNum] || titleEl.textContent;
+        } else {
+          dissolvedState[varNum] = null;
+          titleEl.textContent = poeticTitles[varNum] || titleEl.textContent;
+        }
+      }
+    });
+
+    /* ══════════════════════════════════════════════════
+       CONSTELLATION FRAGMENT REPULSION
+    ══════════════════════════════════════════════════ */
+    document.addEventListener('mousemove', e => {
+      // (Handled inside mousemove throttle above for fast mouse)
+      // For slow/normal: gentle drift away from cursor
+      if (mouseVelocity > FAST_THRESH) return; // handled separately
+      const frags = document.querySelectorAll('.c-fragment');
+      frags.forEach(frag => {
+        const rect = frag.getBoundingClientRect();
+        const fx = rect.left + rect.width / 2;
+        const fy = rect.top + rect.height / 2;
+        const dist = Math.sqrt((e.clientX - fx) ** 2 + (e.clientY - fy) ** 2);
+        if (dist < 100) {
+          const push = (100 - dist) / 100 * 5;
+          const angle = Math.atan2(fy - e.clientY, fx - e.clientX);
+          const tx = Math.cos(angle) * push;
+          const ty = Math.sin(angle) * push;
+          frag.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)`;
+          frag.style.transition = 'transform 0.3s ease-out';
+        } else if (dist < 200) {
+          frag.style.transform = '';
+          frag.style.transition = 'transform 0.5s ease-out';
+        }
+      });
+    });
+
+    /* ══════════════════════════════════════════════════
+       SCROLL PARALLAX
+    ══════════════════════════════════════════════════ */
+    let scrollY = 0;
+    let scrollRaf = null;
+
+    window.addEventListener('scroll', () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = null;
+        scrollY = window.scrollY;
+
+        // Parallax elements
+        document.querySelectorAll('.parallax-slow').forEach(el => {
+          const rate = parseFloat(el.dataset.parallax || '0.1');
+          el.style.transform = `translateY(${scrollY * rate}px)`;
+        });
+
+        // Dissolve effect on scroll: top elements become more poetic
+        const vfs = document.querySelectorAll('.vf');
+        vfs.forEach(vf => {
+          const rect = vf.getBoundingClientRect();
+          const topRatio = rect.top / window.innerHeight;
+          if (topRatio < -0.5) {
+            // Far above viewport = dissolve
+            vf.style.opacity = Math.max(0.3, 1 + topRatio * 1.5);
+            vf.querySelector('.vf-formula').style.opacity = Math.max(0.1, 0.55 + topRatio * 0.5);
+          } else {
+            vf.style.opacity = '';
+            vf.querySelector('.vf-formula').style.opacity = '';
+          }
+        });
+      });
+    });
+
+    /* ══════════════════════════════════════════════════
+       ENTRANCE ANIMATIONS
+    ══════════════════════════════════════════════════ */
+    if (window.IntersectionObserver) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.style.opacity = '1';
+            e.target.style.transform = e.target.style.transform.replace(/translateY\([^)]+\)/, 'translateY(0)');
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.vf').forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(28px)';
+        el.style.transition = `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${i * 0.035}s, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${i * 0.035}s`;
+        observer.observe(el);
+      });
+
+      ['.constellation-title', '.constellation-sub', '.constellation-label', '.personal-band'].forEach(sel => {
+        const els = document.querySelectorAll(sel);
+        els.forEach(el => {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(12px)';
+          el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+          observer.observe(el);
+        });
+      });
+    }
+
+    /* ══════════════════════════════════════════════════
+       PORTAL GLYPH — extra breathing on hover
+    ══════════════════════════════════════════════════ */
+    const glyph = document.getElementById('portal-glyph');
+    if (glyph) {
+      glyph.addEventListener('click', () => {
+        addRipple(glyph.getBoundingClientRect().left + glyph.offsetWidth / 2,
+                  glyph.getBoundingClientRect().top + glyph.offsetHeight / 2);
+      });
+    }
+
+    /* ══════════════════════════════════════════════════
+       37∞ THEME — thread it through page title
+    ══════════════════════════════════════════════════ */
+    let titlePhase = 0;
+    const baseTitle = '37∞ Playground';
+    const titles37 = [
+      '37∞ — The Other Side',
+      '37∞ — Smoothly Becoming',
+      '37∞ — The Skin That Joins',
+      '37∞ — Where Change Rests',
+      '37∞ Playground',
+    ];
+    let titleIdx = 0;
+    setInterval(() => {
+      titleIdx = (titleIdx + 1) % titles37.length;
+      document.title = titles37[titleIdx];
+    }, 8000);
+
+    /* ══════════════════════════════════════════════════
+       RETURN LINK VISIBILITY
+    ══════════════════════════════════════════════════ */
+    const returnLink = document.querySelector('.return-lab');
+    if (returnLink) {
+      document.addEventListener('mousemove', () => {
+        returnLink.style.opacity = '0.45';
+      });
+    }
+
+  })();
+  </script>
+
+</body>
+</html>

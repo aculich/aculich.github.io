@@ -226,9 +226,32 @@
       opacity: 1;
       transform: translateY(0);
       transition: opacity 0.8s ease, transform 0.8s ease, border-color 0.3s, box-shadow 0.3s;
+      position: relative;
     }
 
-    .rosetta-card:hover { border-color: var(--accent); box-shadow: 0 8px 40px rgba(var(--accent-rgb), 0.1); }
+    .rosetta-card:hover { border-color: var(--accent); box-shadow: 0 8px 40px rgba(var(--accent-rgb), 0.1); cursor: pointer; }
+
+    .rosetta-card::before {
+      content: 'step through the grid \2192';
+      position: absolute;
+      bottom: 0.6rem;
+      right: 1.2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.45rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      transform: translateY(4px);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .rosetta-card:hover::before {
+      opacity: 0.7;
+      transform: translateY(0);
+    }
 
     .rosetta-grid {
       display: grid;
@@ -1415,6 +1438,24 @@
       });
     });
 
+    /* ── Rosetta Grid → Playground Portal ── */
+    const rosettaCard = document.querySelector('.rosetta-card');
+    if (rosettaCard) {
+      rosettaCard.style.cursor = 'pointer';
+      rosettaCard.title = 'Step through the grid…';
+      rosettaCard.addEventListener('click', function(e) {
+        // Don't trigger if user is selecting text
+        if (window.getSelection().toString()) return;
+        // Fade out silently, then navigate
+        document.body.style.transition = 'opacity 0.8s ease';
+        document.body.style.opacity = '0';
+        const theme = document.documentElement.getAttribute('data-theme') || 'garden';
+        setTimeout(() => {
+          window.location.href = './playground.html?theme=' + theme;
+        }, 800);
+      });
+    }
+
     /* ── Staggered card entrance ── */
     const cards = document.querySelectorAll('.var-card');
     cards.forEach((card, i) => {
@@ -1960,81 +2001,96 @@
       ctx.strokeStyle = accent;
       ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.font = '900 2rem "Playfair Display", serif';
+      ctx.font = '900 1.6rem "Playfair Display", serif';
       ctx.fillStyle = accent;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('37', cx, cy);
     };
 
-    /* Composition — chained nodes */
+    /* Composition — chain */
     animations['composition'] = function(ctx, W, H, t) {
       ctx.clearRect(0, 0, W, H);
       const accent = getCSSVar('--accent');
       const highlight = getCSSVar('--highlight');
       const muted = getCSSVar('--muted');
+
       const nodes = [
         { x: W * 0.2, y: H * 0.5, label: 'A', color: muted },
         { x: W * 0.5, y: H * 0.5, label: 'B', color: accent },
         { x: W * 0.8, y: H * 0.5, label: 'C', color: highlight }
       ];
-      const progress1 = (Math.sin(t * 0.5) + 1) / 2;
-      const progress2 = (Math.sin(t * 0.5 + Math.PI / 2) + 1) / 2;
 
-      // Arrows
-      [[0, 1, 'f', progress1, accent], [1, 2, 'g', progress2, highlight]].forEach(([from, to, label, prog, color]) => {
-        const A = nodes[from], B = nodes[to];
-        ctx.beginPath();
-        ctx.moveTo(A.x + 30, A.y);
-        ctx.lineTo(B.x - 30, B.y);
-        ctx.strokeStyle = color;
-        ctx.globalAlpha = 0.3;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Particle
-        const px = A.x + 30 + (B.x - A.x - 60) * prog;
-        const py = A.y;
-        ctx.globalAlpha = 0.8;
-        const grd = ctx.createRadialGradient(px, py, 0, px, py, 10);
-        grd.addColorStop(0, color);
-        grd.addColorStop(1, 'transparent');
-        ctx.fillStyle = grd;
-        ctx.beginPath();
-        ctx.arc(px, py, 10, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.globalAlpha = 0.6;
-        ctx.font = '700 0.9rem "Playfair Display", serif';
-        ctx.fillStyle = color;
-        ctx.textAlign = 'center';
-        ctx.fillText(label, (A.x + B.x) / 2, A.y - 35);
-      });
-
-      // Curved g∘f
+      // Arc A→C
       ctx.beginPath();
-      ctx.moveTo(nodes[0].x + 30, nodes[0].y);
-      ctx.bezierCurveTo(nodes[0].x + 80, nodes[0].y - 80, nodes[2].x - 80, nodes[2].y - 80, nodes[2].x - 30, nodes[2].y);
-      ctx.strokeStyle = muted;
+      ctx.moveTo(nodes[0].x + 25, nodes[0].y - 10);
+      ctx.quadraticCurveTo(W / 2, H * 0.15, nodes[2].x - 25, nodes[2].y - 10);
+      ctx.strokeStyle = accent;
       ctx.globalAlpha = 0.2;
       ctx.lineWidth = 1;
       ctx.setLineDash([6, 3]);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.globalAlpha = 0.4;
-      ctx.font = '500 0.75rem "JetBrains Mono", monospace';
-      ctx.fillStyle = muted;
-      ctx.fillText('g ∘ f', W / 2, H * 0.5 - 95);
+
+      // Edges
+      [[0, 1, 'f', accent], [1, 2, 'g', highlight]].forEach(([a, b, lbl, col]) => {
+        ctx.beginPath();
+        ctx.moveTo(nodes[a].x + 25, nodes[a].y);
+        ctx.lineTo(nodes[b].x - 25, nodes[b].y);
+        ctx.strokeStyle = muted;
+        ctx.globalAlpha = 0.3;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Arrow head
+        ctx.globalAlpha = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(nodes[b].x - 32, nodes[b].y - 6);
+        ctx.lineTo(nodes[b].x - 22, nodes[b].y);
+        ctx.lineTo(nodes[b].x - 32, nodes[b].y + 6);
+        ctx.strokeStyle = muted;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Label
+        ctx.globalAlpha = 0.7;
+        ctx.font = '400 0.8rem "JetBrains Mono", monospace';
+        ctx.fillStyle = col;
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl, (nodes[a].x + nodes[b].x) / 2, nodes[a].y - 18);
+      });
+
+      // Animated particle f path then g path
+      const totalProgress = (t * 0.4) % 1;
+      let px, py;
+      if (totalProgress < 0.5) {
+        const p = totalProgress * 2;
+        px = nodes[0].x + (nodes[1].x - nodes[0].x) * p;
+        py = nodes[0].y;
+      } else {
+        const p = (totalProgress - 0.5) * 2;
+        px = nodes[1].x + (nodes[2].x - nodes[1].x) * p;
+        py = nodes[1].y;
+      }
+
+      ctx.globalAlpha = 0.85;
+      const grd = ctx.createRadialGradient(px, py, 0, px, py, 10);
+      grd.addColorStop(0, accent);
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(px, py, 10, 0, Math.PI * 2);
+      ctx.fill();
 
       // Nodes
-      ctx.globalAlpha = 1;
       nodes.forEach(n => {
+        ctx.globalAlpha = 1;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, 28, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, 24, 0, Math.PI * 2);
         ctx.strokeStyle = n.color;
         ctx.lineWidth = 2;
         ctx.stroke();
-        ctx.font = '700 1.3rem "Playfair Display", serif';
+        ctx.font = '700 1.2rem "Playfair Display", serif';
         ctx.fillStyle = n.color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -2042,7 +2098,7 @@
       });
     };
 
-    /* Adjunction — mirror reflection */
+    /* Adjunction */
     animations['adjunction'] = function(ctx, W, H, t) {
       ctx.clearRect(0, 0, W, H);
       const accent = getCSSVar('--accent');
@@ -2050,68 +2106,71 @@
       const muted = getCSSVar('--muted');
       const cx = W / 2, cy = H / 2;
 
-      // Mirror line
+      // Two category blobs
+      ctx.globalAlpha = 0.04;
       ctx.beginPath();
-      ctx.moveTo(cx, 30);
-      ctx.lineTo(cx, H - 30);
-      ctx.strokeStyle = muted;
-      ctx.globalAlpha = 0.15;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Left category nodes
-      const t1 = t * 0.4;
-      for (let i = 0; i < 4; i++) {
-        const angle = (i / 4) * Math.PI * 2 + t1 * 0.2;
-        const x = cx - 120 + Math.cos(angle) * 55;
-        const y = cy + Math.sin(angle) * 55;
-        ctx.globalAlpha = 0.5;
-        ctx.beginPath();
-        ctx.arc(x, y, 8, 0, Math.PI * 2);
-        ctx.fillStyle = accent;
-        ctx.fill();
-
-        // Mirror node on right
-        const mx = cx + (cx - x);
-        ctx.beginPath();
-        ctx.arc(mx, y, 8, 0, Math.PI * 2);
-        ctx.fillStyle = highlight;
-        ctx.fill();
-
-        // F arrow (left → right)
-        const px = x + (mx - x) * ((Math.sin(t * 0.5 + i) + 1) / 2);
-        const py2 = y;
-        ctx.globalAlpha = 0.3;
-        ctx.beginPath();
-        ctx.moveTo(x + 9, y);
-        ctx.lineTo(mx - 9, y);
-        ctx.strokeStyle = muted;
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
-        ctx.globalAlpha = 0.7;
-        ctx.beginPath();
-        ctx.arc(px, py2, 5, 0, Math.PI * 2);
-        ctx.fillStyle = i % 2 === 0 ? accent : highlight;
-        ctx.fill();
-      }
-
-      // F and G labels
-      ctx.globalAlpha = 0.7;
-      ctx.font = '700 1.6rem "Playfair Display", serif';
-      ctx.textAlign = 'center';
+      ctx.arc(cx - 120, cy, 90, 0, Math.PI * 2);
       ctx.fillStyle = accent;
-      ctx.fillText('F', cx - 120, cy - 85);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + 120, cy, 90, 0, Math.PI * 2);
       ctx.fillStyle = highlight;
-      ctx.fillText('G', cx + 120, cy - 85);
-      ctx.globalAlpha = 0.4;
-      ctx.font = '500 0.75rem "JetBrains Mono", monospace';
+      ctx.fill();
+
+      // Oscillating arrows
+      const wave = Math.sin(t * 0.6) * 0.3 + 0.7;
+      // F: left → right
+      ctx.globalAlpha = wave * 0.8;
+      ctx.beginPath();
+      ctx.moveTo(cx - 50, cy - 20);
+      ctx.lineTo(cx + 50, cy - 20);
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + 43, cy - 27);
+      ctx.lineTo(cx + 53, cy - 20);
+      ctx.lineTo(cx + 43, cy - 13);
+      ctx.stroke();
+      ctx.font = '700 1rem "Playfair Display", serif';
+      ctx.fillStyle = accent;
+      ctx.textAlign = 'center';
+      ctx.fillText('F', cx, cy - 30);
+
+      // G: right → left
+      ctx.globalAlpha = (1 - wave * 0.3) * 0.8;
+      ctx.beginPath();
+      ctx.moveTo(cx + 50, cy + 20);
+      ctx.lineTo(cx - 50, cy + 20);
+      ctx.strokeStyle = highlight;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - 43, cy + 13);
+      ctx.lineTo(cx - 53, cy + 20);
+      ctx.lineTo(cx - 43, cy + 27);
+      ctx.stroke();
+      ctx.fillStyle = highlight;
+      ctx.fillText('G', cx, cy + 38);
+
+      // ⊣ symbol
+      ctx.globalAlpha = 0.5;
+      ctx.font = '900 1.5rem "Playfair Display", serif';
       ctx.fillStyle = muted;
-      ctx.fillText('⊣', cx, cy - 85);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('⊣', cx, cy);
+
+      // Labels
+      ctx.globalAlpha = 0.5;
+      ctx.font = '700 1.2rem "Playfair Display", serif';
+      ctx.fillStyle = accent;
+      ctx.fillText('𝒞', cx - 120, cy);
+      ctx.fillStyle = highlight;
+      ctx.fillText('𝒟', cx + 120, cy);
     };
 
-    /* Fixed point — self-referential */
+    /* Fixed point */
     animations['fixedpoint'] = function(ctx, W, H, t) {
       ctx.clearRect(0, 0, W, H);
       const accent = getCSSVar('--accent');
@@ -2119,37 +2178,31 @@
       const muted = getCSSVar('--muted');
       const cx = W / 2, cy = H / 2;
 
-      // Spiraling circles converging to center
-      for (let i = 0; i < 20; i++) {
-        const progress = i / 20;
-        const angle = progress * Math.PI * 8 + t * 0.3;
-        const r = 10 + progress * 140;
-        const x = cx + Math.cos(angle) * r;
-        const y = cy + Math.sin(angle) * r;
-        ctx.globalAlpha = 0.05 + progress * 0.1;
+      // Concentric spiral converging to center
+      for (let i = 0; i < 3; i++) {
+        const startR = 160 - i * 40;
         ctx.beginPath();
-        ctx.arc(x, y, 3 + progress * 5, 0, Math.PI * 2);
-        ctx.fillStyle = progress < 0.5 ? accent : highlight;
-        ctx.fill();
+        for (let a = 0; a < Math.PI * 4; a += 0.05) {
+          const r = startR * (1 - a / (Math.PI * 6)) + Math.sin(a * 3 + t * 0.5) * 5;
+          const x = cx + Math.cos(a + t * 0.1 + i * 1.2) * r;
+          const y = cy + Math.sin(a + t * 0.1 + i * 1.2) * r * 0.6;
+          a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = i === 0 ? accent : i === 1 ? highlight : muted;
+        ctx.globalAlpha = 0.15 + i * 0.05;
+        ctx.lineWidth = 1;
+        ctx.stroke();
       }
 
-      // Fixed point glow
-      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60);
-      grd.addColorStop(0, accent + '40');
-      grd.addColorStop(1, 'transparent');
-      ctx.globalAlpha = 0.6 + 0.2 * Math.sin(t * 0.8);
-      ctx.fillStyle = grd;
+      // Pulsing center
+      const pulse = 0.5 + 0.5 * Math.sin(t * 0.8);
+      ctx.globalAlpha = 0.85;
       ctx.beginPath();
-      ctx.arc(cx, cy, 60, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.globalAlpha = 1;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 42, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 32 + pulse * 6, 0, Math.PI * 2);
       ctx.strokeStyle = accent;
       ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.font = '900 1.6rem "Playfair Display", serif';
+      ctx.font = '900 1.4rem "Playfair Display", serif';
       ctx.fillStyle = accent;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -2162,120 +2215,104 @@
       const accent = getCSSVar('--accent');
       const highlight = getCSSVar('--highlight');
       const muted = getCSSVar('--muted');
-      const cx = W / 2, cy = H / 2;
 
-      // Draw converging oscillation
-      ctx.globalAlpha = 1;
-      ctx.beginPath();
-      const totalPts = 300;
-      for (let i = 0; i <= totalPts; i++) {
-        const x = 40 + (W - 80) * (i / totalPts);
-        const decay = 1 - i / totalPts;
-        const y = cy + Math.sin(i * 0.35 + t * 0.3) * decay * 100;
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      const targetX = W * 0.78;
+      const targetY = H * 0.5;
+
+      // Converging points
+      for (let i = 0; i < 12; i++) {
+        const frac = i / 12;
+        const x = W * 0.1 + (targetX - W * 0.1) * (1 - Math.pow(0.7, i + 1 + (t * 0.3) % 1));
+        const y = targetY + Math.sin(i * 0.8 + t * 0.2) * (60 * (1 - frac));
+
+        ctx.globalAlpha = 0.3 + frac * 0.4;
+        ctx.beginPath();
+        ctx.arc(x, y, 4 + (1 - frac) * 4, 0, Math.PI * 2);
+        ctx.fillStyle = frac > 0.7 ? highlight : accent;
+        ctx.fill();
+
+        if (i > 0) {
+          const prevFrac = (i - 1) / 12;
+          const prevX = W * 0.1 + (targetX - W * 0.1) * (1 - Math.pow(0.7, i + (t * 0.3) % 1));
+          const prevY = targetY + Math.sin((i - 1) * 0.8 + t * 0.2) * (60 * (1 - prevFrac));
+          ctx.beginPath();
+          ctx.moveTo(prevX, prevY);
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = muted;
+          ctx.globalAlpha = 0.1;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
       }
-      ctx.strokeStyle = accent;
+
+      // Target
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.arc(targetX, targetY, 20, 0, Math.PI * 2);
+      ctx.strokeStyle = highlight;
       ctx.lineWidth = 2;
       ctx.stroke();
-
-      // Convergence line
-      ctx.beginPath();
-      ctx.moveTo(40, cy);
-      ctx.lineTo(W - 40, cy);
-      ctx.strokeStyle = highlight;
-      ctx.globalAlpha = 0.3;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([6, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Limit label
-      ctx.globalAlpha = 0.7;
-      ctx.font = '400 0.8rem "JetBrains Mono", monospace';
+      ctx.font = '700 0.9rem "Playfair Display", serif';
       ctx.fillStyle = highlight;
-      ctx.textAlign = 'right';
-      ctx.fillText('lim = 37∞', W - 50, cy - 14);
-
-      // Moving point
-      const progress = (t * 0.15) % 1;
-      const x = 40 + (W - 80) * progress;
-      const decay = 1 - progress;
-      const y = cy + Math.sin(progress * totalPts * 0.35 + t * 0.3) * decay * 100;
-      ctx.globalAlpha = 0.85;
-      const grd = ctx.createRadialGradient(x, y, 0, x, y, 10);
-      grd.addColorStop(0, accent);
-      grd.addColorStop(1, 'transparent');
-      ctx.fillStyle = grd;
-      ctx.beginPath();
-      ctx.arc(x, y, 10, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('lim', targetX, targetY);
     };
 
-    /* Colimit — many converging */
+    /* Colimit — many to one */
     animations['colimit'] = function(ctx, W, H, t) {
       ctx.clearRect(0, 0, W, H);
       const accent = getCSSVar('--accent');
       const highlight = getCSSVar('--highlight');
       const muted = getCSSVar('--muted');
-      const cx = W / 2, cy = H / 2;
 
-      const sources = [];
-      for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * Math.PI * 2;
-        sources.push({
-          x: cx + Math.cos(angle) * 180,
-          y: cy + Math.sin(angle) * 120
-        });
-      }
+      const targetX = W * 0.75, targetY = H * 0.5;
+      const sources = Array.from({ length: 8 }, (_, i) => ({
+        x: W * 0.15 + (i % 2) * W * 0.1,
+        y: H * 0.15 + i * (H * 0.7 / 7)
+      }));
 
       const progress = (Math.sin(t * 0.4) + 1) / 2;
 
-      sources.forEach((s, i) => {
-        const px = s.x + (cx - s.x) * progress;
-        const py = s.y + (cy - s.y) * progress;
+      sources.forEach((src, i) => {
+        const px = src.x + (targetX - src.x) * progress;
+        const py = src.y + (targetY - src.y) * progress;
 
         ctx.beginPath();
-        ctx.moveTo(s.x, s.y);
-        ctx.lineTo(cx, cy);
-        ctx.strokeStyle = i % 3 === 0 ? accent : i % 3 === 1 ? highlight : muted;
-        ctx.globalAlpha = 0.08 + 0.04 * Math.sin(t + i);
+        ctx.moveTo(src.x, src.y);
+        ctx.lineTo(targetX, targetY);
+        ctx.strokeStyle = i % 2 === 0 ? accent : muted;
+        ctx.globalAlpha = 0.08;
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        ctx.globalAlpha = 0.5;
+        ctx.globalAlpha = 0.5 + progress * 0.3;
         ctx.beginPath();
         ctx.arc(px, py, 5, 0, Math.PI * 2);
         ctx.fillStyle = i % 3 === 0 ? accent : i % 3 === 1 ? highlight : muted;
         ctx.fill();
 
-        ctx.globalAlpha = 0.3;
+        ctx.globalAlpha = 0.5;
         ctx.beginPath();
-        ctx.arc(s.x, s.y, 12, 0, Math.PI * 2);
-        ctx.strokeStyle = i % 3 === 0 ? accent : i % 3 === 1 ? highlight : muted;
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        ctx.arc(src.x, src.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = muted;
+        ctx.fill();
       });
 
-      // Center colimit
-      const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 40 + 10 * Math.sin(t * 0.6));
-      grd.addColorStop(0, highlight + '50');
-      grd.addColorStop(1, 'transparent');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = grd;
+      // Result node
+      ctx.globalAlpha = 0.8 + progress * 0.2;
       ctx.beginPath();
-      ctx.arc(cx, cy, 50, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+      ctx.arc(targetX, targetY, 28 + progress * 8, 0, Math.PI * 2);
       ctx.strokeStyle = highlight;
       ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.font = '700 0.7rem "JetBrains Mono", monospace';
+      ctx.font = '700 0.8rem "JetBrains Mono", monospace';
       ctx.fillStyle = highlight;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('colim', cx, cy);
+      ctx.fillText('colim', targetX, targetY - 8);
+      ctx.font = '700 1rem "Playfair Display", serif';
+      ctx.fillText('{P}', targetX, targetY + 10);
     };
 
     /* Euler spiral */
@@ -2286,133 +2323,110 @@
       const muted = getCSSVar('--muted');
       const cx = W / 2, cy = H / 2;
 
-      const maxS = 6 + (t * 0.2) % 4;
+      const maxS = 3 + (t * 0.15) % 3;
       const steps = 800;
       const dt = maxS / steps;
       let s = 0, x = 0, y = 0, angle = 0;
-      let pts = [[0, 0]];
+      const scale = Math.min(W, H) * 0.12;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
       for (let i = 0; i < steps; i++) {
-        angle += s * s * 0.12;
-        x += Math.cos(angle) * dt * 25;
-        y += Math.sin(angle) * dt * 25;
-        pts.push([x, y]);
+        angle += s * s * 0.1;
+        x += Math.cos(angle) * dt * scale;
+        y += Math.sin(angle) * dt * scale;
+        ctx.lineTo(x, y);
         s += dt;
       }
+      ctx.strokeStyle = accent;
+      ctx.globalAlpha = 0.8;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
-      // Draw with gradient stroke
-      for (let i = 1; i < pts.length; i++) {
-        const progress = i / pts.length;
-        ctx.beginPath();
-        ctx.moveTo(cx + pts[i - 1][0], cy + pts[i - 1][1]);
-        ctx.lineTo(cx + pts[i][0], cy + pts[i][1]);
-        const r = Math.round(parseInt(accent.slice(1, 3) || '90', 16) * (1 - progress) + parseInt((highlight.slice(1, 3) || 'c4'), 16) * progress);
-        ctx.strokeStyle = accent;
-        ctx.globalAlpha = 0.1 + progress * 0.7;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
+      // Mirror
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      s = 0; x = 0; y = 0; angle = 0;
+      for (let i = 0; i < steps; i++) {
+        angle += s * s * 0.1;
+        x -= Math.cos(angle) * dt * scale;
+        y -= Math.sin(angle) * dt * scale;
+        ctx.lineTo(x, y);
+        s += dt;
       }
-
-      // Leading dot
-      if (pts.length > 0) {
-        const last = pts[pts.length - 1];
-        ctx.globalAlpha = 1;
-        const grd = ctx.createRadialGradient(cx + last[0], cy + last[1], 0, cx + last[0], cy + last[1], 12);
-        grd.addColorStop(0, highlight);
-        grd.addColorStop(1, 'transparent');
-        ctx.fillStyle = grd;
-        ctx.beginPath();
-        ctx.arc(cx + last[0], cy + last[1], 12, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.strokeStyle = highlight;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
     };
 
-    /* Braid — crossing strands */
+    /* Braid */
     animations['braid'] = function(ctx, W, H, t) {
       ctx.clearRect(0, 0, W, H);
       const accent = getCSSVar('--accent');
       const highlight = getCSSVar('--highlight');
       const muted = getCSSVar('--muted');
 
-      const strands = [accent, highlight, muted];
-      const period = H / 3;
-      const offset = t * 40;
+      const strands = 3;
+      const colors = [accent, highlight, muted];
+      const height = H;
+      const steps = 100;
 
-      strands.forEach((color, si) => {
+      for (let s = 0; s < strands; s++) {
         ctx.beginPath();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 3;
-        ctx.globalAlpha = 0.7;
-
-        for (let yp = 0; yp <= H + period; yp += 2) {
-          const phase = (yp + offset) / period;
-          const baseX = W / 2 + (si - 1) * 60;
-          const wave = Math.sin(phase * Math.PI * 2 + si * (Math.PI * 2 / 3)) * 60;
-          const x = baseX + wave;
-          yp === 0 ? ctx.moveTo(x, yp) : ctx.lineTo(x, yp);
+        for (let i = 0; i <= steps; i++) {
+          const progress = i / steps;
+          const y = progress * height;
+          const baseX = W / 2 + (s - 1) * 80;
+          const x = baseX + Math.sin(progress * Math.PI * 4 + s * (Math.PI * 2 / strands) + t * 0.3) * 60;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
+        ctx.strokeStyle = colors[s];
+        ctx.globalAlpha = 0.7;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
-      });
+      }
     };
 
-    /* Homotopy — morphing paths */
+    /* Homotopy */
     animations['homotopy'] = function(ctx, W, H, t) {
       ctx.clearRect(0, 0, W, H);
       const accent = getCSSVar('--accent');
       const highlight = getCSSVar('--highlight');
       const muted = getCSSVar('--muted');
-      const cx = W / 2, cy = H / 2;
 
-      const steps = 10;
-      for (let step = 0; step <= steps; step++) {
-        const lambda = step / steps;
-        const progress = (Math.sin(t * 0.4) + 1) / 2;
-        const effective = lambda;
+      const n = 8;
+      for (let i = 0; i <= n; i++) {
+        const frac = i / n;
+        const amp = 80 * Math.cos(frac * Math.PI / 2);
+        const phase = t * 0.3;
 
         ctx.beginPath();
-        const isF = effective === 0;
-        const isG = effective === 1;
-        for (let i = 0; i <= 100; i++) {
-          const s = i / 100;
-          const x = 50 + (W - 100) * s;
-          const fY = cy + Math.sin(s * Math.PI * 2) * 80;
-          const gY = cy - Math.sin(s * Math.PI * 2) * 80;
-          const y = fY * (1 - effective) + gY * effective;
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        for (let x = 0; x <= W; x += 3) {
+          const nx = x / W;
+          const y = H / 2 + Math.sin(nx * Math.PI * 2 + phase + frac * Math.PI) * amp * (1 - frac * 0.5);
+          x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
-
-        ctx.strokeStyle = isF ? accent : isG ? highlight : muted;
-        ctx.globalAlpha = isF || isG ? 0.7 : 0.12;
-        ctx.lineWidth = isF || isG ? 2 : 1;
+        const alpha = frac === 0 ? 0.8 : frac === 1 ? 0.8 : 0.15;
+        ctx.strokeStyle = frac < 0.5 ? accent : highlight;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = frac === 0 || frac === 1 ? 2 : 1;
         ctx.stroke();
       }
 
-      // Animated interpolating path
-      const progress = (Math.sin(t * 0.5) + 1) / 2;
-      ctx.beginPath();
-      for (let i = 0; i <= 100; i++) {
-        const s = i / 100;
-        const x = 50 + (W - 100) * s;
-        const fY = cy + Math.sin(s * Math.PI * 2) * 80;
-        const gY = cy - Math.sin(s * Math.PI * 2) * 80;
-        const y = fY * (1 - progress) + gY * progress;
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = accent;
-      ctx.globalAlpha = 0.9;
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-
-      // Labels
-      ctx.globalAlpha = 0.6;
-      ctx.font = '700 1rem "Playfair Display", serif';
+      ctx.globalAlpha = 0.5;
+      ctx.font = '400 0.8rem "JetBrains Mono", monospace';
       ctx.fillStyle = accent;
       ctx.textAlign = 'left';
-      ctx.fillText('f', 30, cy + 90);
+      ctx.fillText('f', 12, H / 2 - 90);
       ctx.fillStyle = highlight;
-      ctx.fillText('g', 30, cy - 80);
+      ctx.fillText('g', 12, H / 2 + 90);
     };
 
-    /* Boundary — boundary of a region */
+    /* Boundary */
     animations['boundary'] = function(ctx, W, H, t) {
       ctx.clearRect(0, 0, W, H);
       const accent = getCSSVar('--accent');
@@ -2420,144 +2434,113 @@
       const muted = getCSSVar('--muted');
       const cx = W / 2, cy = H / 2;
 
-      // Interior: network of nodes
-      const community = [];
-      for (let i = 0; i < 20; i++) {
-        const angle = (i / 20) * Math.PI * 2;
-        community.push({
-          x: cx + Math.cos(angle) * (50 + i % 3 * 30),
-          y: cy + Math.sin(angle) * (50 + i % 3 * 25)
-        });
+      // Main space — large blob
+      const blobR = Math.min(W, H) * 0.3;
+      ctx.beginPath();
+      for (let a = 0; a <= Math.PI * 2; a += 0.05) {
+        const r = blobR + Math.sin(a * 4 + t * 0.3) * blobR * 0.08;
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r * 0.7;
+        a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = accent;
+      ctx.globalAlpha = 0.3;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = 0.03;
+      ctx.fill();
+
+      // Boundary ring — thicker, animated
+      ctx.beginPath();
+      for (let a = 0; a <= Math.PI * 2; a += 0.05) {
+        const r = blobR + Math.sin(a * 4 + t * 0.3) * blobR * 0.08;
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r * 0.7;
+        a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = highlight;
+      ctx.globalAlpha = 0.6 + 0.2 * Math.sin(t * 0.8);
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Community dots on boundary
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2 + t * 0.1;
+        const r = blobR + Math.sin(a * 4 + t * 0.3) * blobR * 0.08;
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r * 0.7;
+        ctx.globalAlpha = 0.6 + 0.3 * Math.sin(t + i);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = highlight;
+        ctx.fill();
       }
 
-      // Interior connections
-      community.forEach((n, i) => {
-        const next = community[(i + 2) % community.length];
-        ctx.beginPath();
-        ctx.moveTo(n.x, n.y);
-        ctx.lineTo(next.x, next.y);
-        ctx.strokeStyle = muted;
-        ctx.globalAlpha = 0.06;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      });
-
-      // Community nodes
-      community.forEach((n, i) => {
-        const pulse = Math.sin(t * 0.5 + i * 0.4) * 0.3 + 0.7;
-        ctx.globalAlpha = 0.2 * pulse;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, 5, 0, Math.PI * 2);
-        ctx.fillStyle = i % 3 === 0 ? accent : i % 3 === 1 ? highlight : muted;
-        ctx.fill();
-      });
-
-      // Boundary ring
+      // Center label
       ctx.globalAlpha = 0.7;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 130 + 5 * Math.sin(t * 0.4), 0, Math.PI * 2);
-      ctx.strokeStyle = highlight;
-      ctx.lineWidth = 2.5;
-      ctx.setLineDash([8, 5]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // ∂ label
-      ctx.globalAlpha = 0.6;
-      ctx.font = '700 1.2rem "Playfair Display", serif';
-      ctx.fillStyle = highlight;
+      ctx.font = '900 1.6rem "Playfair Display", serif';
+      ctx.fillStyle = accent;
       ctx.textAlign = 'center';
-      ctx.fillText('∂(37∞) = community', cx, H - 60);
+      ctx.textBaseline = 'middle';
+      ctx.fillText('37∞', cx, cy);
 
-      // ∂∂ = 0
-      ctx.globalAlpha = 0.3;
-      ctx.font = '400 0.7rem "JetBrains Mono", monospace';
-      ctx.fillStyle = muted;
-      ctx.fillText('∂∂ = 0', cx, H - 42);
+      // ∂ symbol
+      ctx.globalAlpha = 0.4;
+      ctx.font = '300 0.8rem "JetBrains Mono", monospace';
+      ctx.fillStyle = highlight;
+      ctx.fillText('∂(37∞) = community', cx, cy + blobR + 30);
     };
 
-    /* ── Open / close fullscreen ── */
-    let isOpen = false;
-
-    function openCard(card) {
+    /* Open overlay */
+    function openOverlay(card) {
       const varNum = card.dataset.var;
       const title = card.dataset.title;
       const formula = card.dataset.formula;
       const desc = card.dataset.desc;
-      const anim = card.dataset.anim;
+      const animKey = card.dataset.anim;
 
-      fsNum.textContent = `VAR ${varNum}`;
+      fsNum.textContent = 'VAR ' + varNum;
       fsTitle.textContent = title;
       fsFormula.textContent = formula;
       fsDesc.textContent = desc;
 
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden', 'false');
-      isOpen = true;
+      document.body.style.overflow = 'hidden';
 
-      // Resize canvas
-      const W = window.innerWidth;
-      const H = window.innerHeight;
-      fsCanvas.width = W;
-      fsCanvas.height = H;
-
+      // Canvas setup
+      fsCanvas.width = window.innerWidth;
+      fsCanvas.height = window.innerHeight;
       const ctx = fsCanvas.getContext('2d');
-      let startTime = null;
 
-      function drawFrame(ts) {
-        if (!isOpen) return;
+      let startTime = null;
+      function frame(ts) {
         if (!startTime) startTime = ts;
         const t = (ts - startTime) / 1000;
-        const fn = animations[anim] || animations['countdown'];
-        fn(ctx, W, H, t);
-        animFrame = requestAnimationFrame(drawFrame);
+        if (animations[animKey]) animations[animKey](ctx, fsCanvas.width, fsCanvas.height, t);
+        animFrame = requestAnimationFrame(frame);
       }
-
       if (animFrame) cancelAnimationFrame(animFrame);
-      animFrame = requestAnimationFrame(drawFrame);
+      animFrame = requestAnimationFrame(frame);
     }
 
     function closeOverlay() {
       overlay.classList.remove('open');
       overlay.setAttribute('aria-hidden', 'true');
-      isOpen = false;
-      if (animFrame) {
-        cancelAnimationFrame(animFrame);
-        animFrame = null;
-      }
+      document.body.style.overflow = '';
+      if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
     }
 
-    // Card click
-    cards.forEach(card => {
-      card.addEventListener('click', () => openCard(card));
+    document.querySelectorAll('.var-card').forEach(card => {
+      card.addEventListener('click', () => openOverlay(card));
     });
 
-    // Close button
     fsClose.addEventListener('click', closeOverlay);
-
-    // Escape key
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && isOpen) closeOverlay();
-    });
-
-    // Click overlay background to close
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay || e.target === fsCanvas) closeOverlay();
-    });
-
-    // Resize canvas
-    window.addEventListener('resize', () => {
-      if (isOpen) {
-        fsCanvas.width = window.innerWidth;
-        fsCanvas.height = window.innerHeight;
-      }
-    });
-
-    /* ── Hover: pulse animation on card ── */
-    cards.forEach(card => {
-      card.addEventListener('mouseenter', () => card.classList.add('hover-pulse'));
-      card.addEventListener('mouseleave', () => card.classList.remove('hover-pulse'));
-    });
+    overlay.addEventListener('click', e => { if (e.target === overlay || e.target === fsCanvas) closeOverlay(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
 
   })();
   </script>

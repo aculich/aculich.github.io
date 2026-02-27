@@ -16,7 +16,7 @@ let currentTheme = 0;
 
 // ── CYCLING WORDS ─────────────────────────────────
 const WORDS = ['Build', 'Research', 'Create', 'Design', 'Ship', 'Explore', 'Automate', 'Connect'];
-const CO_WORDS = ['Co\u2011Build', 'Co\u2011Research', 'Co\u2011Create', 'Co\u2011Design', 'Co\u2011Ship', 'Co\u2011Explore', 'Co\u2011Automate', 'Co\u2011Connect'];
+const CO_WORDS = ['Co‑Build', 'Co‑Research', 'Co‑Create', 'Co‑Design', 'Co‑Ship', 'Co‑Explore', 'Co‑Automate', 'Co‑Connect'];
 let wordIndex = 0;
 let wordCycleTimer = null;
 let cycleCount = 0;

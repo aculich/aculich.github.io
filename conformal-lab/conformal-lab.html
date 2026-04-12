@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ocean">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>37∞ Conformal Lab — Where Curves Become Worlds</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;0,900;1,400;1,700&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" />
+
+  <style>
+    :root, [data-theme="ocean"] {
+      --bg: #0a1628; --bg-rgb: 10, 22, 40;
+      --text: #c8e6ff; --text-rgb: 200, 230, 255;
+      --accent: #00d4ff; --accent-rgb: 0, 212, 255;
+      --highlight: #ff6b6b; --highlight-rgb: 255, 107, 107;
+      --muted: #6a9ab8;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(0,212,255,0.15);
+    }
+    [data-theme="garden"] {
+      --bg: #faf8f5; --bg-rgb: 250, 248, 245;
+      --text: #271a00; --text-rgb: 39, 26, 0;
+      --accent: #5a7247; --accent-rgb: 90, 114, 71;
+      --highlight: #c4a35a; --highlight-rgb: 196, 163, 90;
+      --muted: #8a7d6a;
+      --card-bg: rgba(255,255,255,0.6);
+      --card-border: rgba(90,114,71,0.12);
+    }
+    [data-theme="geometry"] {
+      --bg: #f0f0f0; --bg-rgb: 240, 240, 240;
+      --text: #1a1a2e; --text-rgb: 26, 26, 46;
+      --accent: #7c3aed; --accent-rgb: 124, 58, 237;
+      --highlight: #f59e0b; --highlight-rgb: 245, 158, 11;
+      --muted: #6b6b8a;
+      --card-bg: rgba(124,58,237,0.05);
+      --card-border: rgba(124,58,237,0.12);
+    }
+    [data-theme="urban"] {
+      --bg: #121212; --bg-rgb: 18, 18, 18;
+      --text: #faf0e6; --text-rgb: 250, 240, 230;
+      --accent: #ff6600; --accent-rgb: 255, 102, 0;
+      --highlight: #00aaff; --highlight-rgb: 0, 170, 255;
+      --muted: #888880;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,102,0,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.6s, color 0.6s;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+
+    /* Theme switcher */
+    .theme-bar {
+      position: fixed; top: 1.5rem; right: 2rem; z-index: 100;
+      display: flex; gap: 0.4rem;
+    }
+    .theme-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid rgba(var(--text-rgb), 0.2);
+      cursor: pointer; transition: transform 0.3s, border-color 0.3s;
+    }
+    .theme-dot:hover { transform: scale(1.3); }
+    .theme-dot.active { border-color: var(--accent); transform: scale(1.2); }
+    .theme-dot[data-t="garden"] { background: #5a7247; }
+    .theme-dot[data-t="ocean"] { background: #00d4ff; }
+    .theme-dot[data-t="geometry"] { background: #7c3aed; }
+    .theme-dot[data-t="urban"] { background: #ff6600; }
+
+    .back-link {
+      position: fixed; top: 1.8rem; left: 2rem; z-index: 100;
+      font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; opacity: 0.4;
+      transition: opacity 0.3s, color 0.3s;
+    }
+    .back-link:hover { opacity: 1; color: var(--accent); }
+
+    /* Sections */
+    .section {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 24px; position: relative;
+    }
+    .section-half { min-height: 70vh; padding: 40px 24px; }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+      letter-spacing: -0.02em; margin-bottom: 0.3em; text-align: center;
+    }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 3vw, 2rem); font-weight: 700;
+      margin-bottom: 0.4em; text-align: center;
+    }
+    .subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic; font-size: 1rem; color: var(--muted);
+      max-width: 600px; text-align: center; margin-bottom: 2rem; line-height: 1.7;
+    }
+    .formula-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem; color: var(--accent); margin: 0.8rem 0 1.5rem;
+      letter-spacing: 0.04em; text-align: center;
+    }
+    .caption {
+      margin-top: 1.2rem; font-size: 0.88rem; color: var(--muted);
+      max-width: 560px; text-align: center; line-height: 1.65;
+    }
+
+    canvas {
+      border-radius: 6px;
+      max-width: 100%;
+    }
+
+    .divider {
+      width: 50px; height: 1px; margin: 0 auto;
+      background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+    }
+
+    /* Controls */
+    .ctrl-row {
+      display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; justify-content: center;
+    }
+    .ctrl-btn {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--muted); padding: 6px 18px; border-radius: 20px;
+      cursor: pointer; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      transition: all 0.3s;
+    }
+    .ctrl-btn:hover { border-color: var(--accent); color: var(--text); }
+    .ctrl-btn.active { background: rgba(var(--accent-rgb), 0.15); border-color: var(--accent); color: var(--accent); }
+
+    .slider-row {
+      display: flex; gap: 18px; margin-top: 14px; align-items: center;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .slider-group { display: flex; align-items: center; gap: 8px; }
+    .slider-group label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    input[type="range"] {
+      -webkit-appearance: none; width: 120px; height: 3px;
+      background: var(--card-border); border-radius: 2px; outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 12px; height: 12px;
+      background: var(--accent); border-radius: 50%; cursor: pointer;
+    }
+
+    /* Rosetta bridge */
+    .rosetta-bridge {
+      max-width: 800px; margin: 0 auto; padding: 0 24px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .bridge-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 1.5rem;
+      backdrop-filter: blur(6px);
+    }
+    .bridge-card h3 {
+      font-family: 'Playfair Display', serif; font-size: 1rem;
+      font-weight: 700; margin-bottom: 0.6rem; color: var(--accent);
+    }
+    .bridge-card p {
+      font-size: 0.82rem; color: var(--muted); line-height: 1.6;
+    }
+    .bridge-card .math {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+      color: var(--highlight); margin: 0.6rem 0; display: block;
+    }
+
+    @media (max-width: 700px) {
+      .rosetta-bridge { grid-template-columns: 1fr; }
+      canvas { width: 100% !important; height: auto !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="theme-bar">
+  <div class="theme-dot active" data-t="ocean"></div>
+  <div class="theme-dot" data-t="garden"></div>
+  <div class="theme-dot" data-t="geometry"></div>
+  <div class="theme-dot" data-t="urban"></div>
+</div>
+<a href="#" class="back-link mono">&larr; Back to Lab</a>
+
+<!-- ═══ 1. HERO ═══ -->
+<div class="section" id="hero">
+  <h1>37<sup style="font-size:0.5em; color:var(--highlight);">&infin;</sup> Conformal Lab</h1>
+  <h2 style="font-weight:400; color:var(--muted);">Where Curves Become Worlds</h2>
+  <p class="subtitle">
+    Conformal maps preserve local shape while transforming the whole.
+    The Euler spiral, the complex exponential, and Escher's Print Gallery
+    are all chapters of the same story — told in the language of
+    <em>f(z) = e<sup>z</sup></em>.
+  </p>
+  <canvas id="heroCanvas" width="700" height="700"></canvas>
+  <p class="caption">An Euler spiral rendered through a conformal lens. Mouse over to warp the field.</p>
+</div>
+
+<!-- ═══ 2. WHAT CONFORMAL MEANS ═══ -->
+<div class="section section-half" id="conformal">
+  <h2>What "Conformal" Means</h2>
+  <p class="formula-display">f'(z) &ne; 0 &nbsp;&rArr;&nbsp; angles preserved locally</p>
+  <canvas id="gridCanvas" width="800" height="450"></canvas>
+  <div class="ctrl-row">
+    <button class="ctrl-btn active" onclick="setGridMap('identity')">Identity</button>
+    <button class="ctrl-btn" onclick="setGridMap('exp')">e<sup>z</sup></button>
+    <button class="ctrl-btn" onclick="setGridMap('log')">log(z)</button>
+    <button class="ctrl-btn" onclick="setGridMap('inv')">1/z</button>
+    <button class="ctrl-btn" onclick="setGridMap('sq')">z&sup2;</button>
+    <button class="ctrl-btn" onclick="setGridMap('euler')">Euler Spiral</button>
+  </div>
+  <p class="caption">A square grid under different conformal maps. Notice: tiny squares stay approximately square everywhere — that's conformality. The shape warps globally, but angles are preserved locally.</p>
+</div>
+
+<div class="divider" style="margin: 40px auto;"></div>
+
+<!-- ═══ 3. THE DROSTE SPIRAL ═══ -->
+<div class="section" id="droste">
+  <h2>The Droste Spiral</h2>
+  <p class="subtitle">Escher's Print Gallery lives on a torus in C*/⟨q⟩. The complex exponential maps a strip into a spiraling self-similar world. De Smit & Lenstra showed how to fill the hole Escher left blank.</p>
+  <p class="formula-display">z &mapsto; z &middot; e<sup>2&pi;i&middot;log(z)/log(q)</sup></p>
+  <canvas id="drosteCanvas" width="700" height="700"></canvas>
+  <div class="slider-row">
+    <div class="slider-group">
+      <label>spiral</label>
+      <input type="range" id="drosteAngle" min="0" max="6.28" step="0.01" value="0.4">
+    </div>
+    <div class="slider-group">
+      <label>zoom</label>
+      <input type="range" id="drosteZoom" min="0.5" max="4" step="0.05" value="1.5">
+    </div>
+    <div class="slider-group">
+      <label>speed</label>
+      <input type="range" id="drosteSpeed" min="0" max="2" step="0.05" value="0.6">
+    </div>
+  </div>
+  <p class="caption">The Droste effect: images embedded within themselves, spiraling inward forever. The complex logarithm unrolls this spiral into a periodic strip — the same periodicity that lets Escher's gallery loop back into itself.</p>
+</div>
+
+<div class="divider" style="margin: 40px auto;"></div>
+
+<!-- ═══ 4. EULER SPIRAL MEETS CONFORMAL ═══ -->
+<div class="section" id="euler-conformal">
+  <h2>The Euler Spiral as Conformal Flow</h2>
+  <p class="subtitle">The Fresnel integral ∫₀ˢ e<sup>it²</sup> dt is itself a conformal map — it sends the real line into a curve whose curvature increases linearly. Watch what happens when we compose it with other conformal maps.</p>
+  <canvas id="eulerConfCanvas" width="800" height="600"></canvas>
+  <div class="ctrl-row">
+    <button class="ctrl-btn active" onclick="setEulerMode('pure')">Pure Euler</button>
+    <button class="ctrl-btn" onclick="setEulerMode('exp')">exp ∘ Euler</button>
+    <button class="ctrl-btn" onclick="setEulerMode('inv')">1/z ∘ Euler</button>
+    <button class="ctrl-btn" onclick="setEulerMode('log')">log ∘ Euler</button>
+    <button class="ctrl-btn" onclick="setEulerMode('droste')">Droste ∘ Euler</button>
+  </div>
+  <p class="caption">Composing conformal maps creates new curves that inherit the "deliberate acceleration" property — curvature still increases, but the space it lives in has been transformed.</p>
+</div>
+
+<div class="divider" style="margin: 40px auto;"></div>
+
+<!-- ═══ 5. THE DELIBERATE ACCELERATION FIELD ═══ -->
+<div class="section" id="field">
+  <h2>The Acceleration Field</h2>
+  <p class="subtitle">What if deliberate acceleration isn't a single curve, but a whole field? Here, every point traces its own Euler spiral, colored by curvature. The field reveals where acceleration is gentle and where it intensifies.</p>
+  <canvas id="fieldCanvas" width="800" height="600"></canvas>
+  <div class="slider-row">
+    <div class="slider-group">
+      <label>density</label>
+      <input type="range" id="fieldDensity" min="4" max="20" step="1" value="10">
+    </div>
+    <div class="slider-group">
+      <label>length</label>
+      <input type="range" id="fieldLength" min="1" max="8" step="0.2" value="4">
+    </div>
+    <div class="slider-group">
+      <label>warp</label>
+      <input type="range" id="fieldWarp" min="0" max="1" step="0.02" value="0">
+    </div>
+  </div>
+  <p class="caption">Move the warp slider to apply a conformal map to the entire field — watch how the spirals transform while preserving their local character.</p>
+</div>
+
+<div class="divider" style="margin: 40px auto;"></div>
+
+<!-- ═══ 6. ROSETTA BRIDGE ═══ -->
+<div class="section section-half" id="rosetta">
+  <h2>The Conformal Rosetta</h2>
+  <p class="subtitle">Connecting the threads: how conformal maps bridge the mathematical ideas in the 37∞ Lab.</p>
+
+  <div class="rosetta-bridge">
+    <div class="bridge-card">
+      <h3>Euler Spiral &harr; Homotopy</h3>
+      <span class="math">∫₀ˢ e<sup>it²</sup> dt</span>
+      <p>The Euler spiral is a homotopy between a straight line (s=0, zero curvature) and a circle (s&rarr;&infin;, constant curvature). Every stage of deliberate acceleration is a deformation of the path before it.</p>
+    </div>
+    <div class="bridge-card">
+      <h3>Conformal Map &harr; Morphism</h3>
+      <span class="math">f: C &rarr; C, f'(z) &ne; 0</span>
+      <p>A conformal map is a morphism in the category of Riemann surfaces — it preserves the structure that matters (angles) while transforming everything else. Structure-preserving change.</p>
+    </div>
+    <div class="bridge-card">
+      <h3>Droste Effect &harr; Fixed Point</h3>
+      <span class="math">z &mapsto; q &middot; z (mod lattice)</span>
+      <p>The Droste spiral's self-similarity is a fixed point of the scaling map. Escher's gallery loops back into itself — like Banach's theorem, the iteration converges to exactly one image.</p>
+    </div>
+    <div class="bridge-card">
+      <h3>exp(z) &harr; Cobordism</h3>
+      <span class="math">e<sup>z</sup>: strips &rarr; annuli</span>
+      <p>The complex exponential maps horizontal strips to annuli — it's a cobordism between the flat additive world and the curved multiplicative one. Two geometries, one smooth surface connecting them.</p>
+    </div>
+    <div class="bridge-card">
+      <h3>log(z) &harr; Boundary</h3>
+      <span class="math">log: C* &rarr; C/2&pi;i</span>
+      <p>The complex logarithm unrolls circles into lines, revealing periodicity. It exposes the boundary: where the smooth world breaks down (at z=0) is where meaning concentrates. ∂∂ = 0.</p>
+    </div>
+    <div class="bridge-card">
+      <h3>Composition &harr; Braid</h3>
+      <span class="math">f ∘ g ∘ h &ne; f ∘ h ∘ g</span>
+      <p>Composing conformal maps doesn't always commute — the order matters, like braid crossings. Each composition is a new strand in the weave, and the final pattern depends on the sequence.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider" style="margin: 60px auto;"></div>
+
+<footer style="text-align:center; padding:2rem; opacity:0.5;">
+  <p class="mono" style="font-size:0.55rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted);">
+    Phase Shift &middot; 37&infin; Conformal Lab &middot; Where Curves Become Worlds
+  </p>
+</footer>
+
+<script>
+'use strict';
+
+// ═══ THEME ═══
+document.querySelectorAll('.theme-dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+    dot.classList.add('active');
+    document.documentElement.setAttribute('data-theme', dot.dataset.t);
+  });
+});
+
+function getCSSVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function parseColor(cssColor) {
+  const c = document.createElement('canvas').getContext('2d');
+  c.fillStyle = cssColor;
+  return c.fillStyle;
+}
+
+// ═══ MATH HELPERS ═══
+function fresnelPoint(s, steps) {
+  steps = steps || Math.max(100, Math.floor(Math.abs(s) * 60));
+  const dt = s / steps;
+  let x = 0, y = 0;
+  for (let i = 0; i < steps; i++) {
+    const t = (i + 0.5) * dt;
+    x += Math.cos(t * t) * dt;
+    y += Math.sin(t * t) * dt;
+  }
+  return [x, y];
+}
+
+function cMul(a, b) { return [a[0]*b[0] - a[1]*b[1], a[0]*b[1] + a[1]*b[0]]; }
+function cExp(z) { const r = Math.exp(z[0]); return [r*Math.cos(z[1]), r*Math.sin(z[1])]; }
+function cLog(z) { return [Math.log(Math.sqrt(z[0]*z[0]+z[1]*z[1])), Math.atan2(z[1], z[0])]; }
+function cInv(z) { const d = z[0]*z[0]+z[1]*z[1]+1e-10; return [z[0]/d, -z[1]/d]; }
+function cSq(z) { return [z[0]*z[0]-z[1]*z[1], 2*z[0]*z[1]]; }
+
+// ═══ 1. HERO CANVAS ═══
+(function() {
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2, scale = 140;
+
+  let mouseX = cx, mouseY = cy;
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = (e.clientX - r.left) * (W / r.width);
+    mouseY = (e.clientY - r.top) * (H / r.height);
+  });
+
+  function draw() {
+    ctx.fillStyle = getCSSVar('--bg');
+    ctx.fillRect(0, 0, W, H);
+
+    const accent = getCSSVar('--accent');
+    const highlight = getCSSVar('--highlight');
+    const muted = getCSSVar('--muted');
+    const t = performance.now() / 1000;
+
+    // Mouse influence as a conformal warp parameter
+    const mx = (mouseX - cx) / (W * 0.5);
+    const my = (mouseY - cy) / (H * 0.5);
+    const warpStr = Math.sqrt(mx*mx + my*my) * 0.3;
+
+    // Draw conformal grid (faint)
+    ctx.globalAlpha = 0.06;
+    for (let i = -6; i <= 6; i++) {
+      ctx.beginPath();
+      for (let j = 0; j <= 100; j++) {
+        const u = i * 0.5;
+        const v = (j/100 - 0.5) * 6;
+        let z = [u, v];
+        // Gentle warp based on mouse
+        z[0] += warpStr * Math.sin(v * 0.5 + t * 0.3) * mx;
+        z[1] += warpStr * Math.cos(u * 0.5 + t * 0.3) * my;
+        const x = cx + z[0] * scale * 0.5;
+        const y = cy - z[1] * scale * 0.5;
+        j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+
+      ctx.beginPath();
+      for (let j = 0; j <= 100; j++) {
+        const u = (j/100 - 0.5) * 6;
+        const v = i * 0.5;
+        let z = [u, v];
+        z[0] += warpStr * Math.sin(v * 0.5 + t * 0.3) * mx;
+        z[1] += warpStr * Math.cos(u * 0.5 + t * 0.3) * my;
+        const x = cx + z[0] * scale * 0.5;
+        const y = cy - z[1] * scale * 0.5;
+        j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = accent;
+      ctx.stroke();
+    }
+
+    // Draw Euler spiral — both halves
+    const numPts = 2000;
+    const sMax = 7 + Math.sin(t * 0.2) * 0.5;
+
+    for (let sign = -1; sign <= 1; sign += 2) {
+      for (let i = 1; i <= numPts; i++) {
+        const s = sign * (i / numPts) * sMax;
+        const prev_s = sign * ((i-1) / numPts) * sMax;
+        let p = fresnelPoint(s, 200);
+        let pp = fresnelPoint(prev_s, 200);
+
+        // Apply mouse warp
+        p[0] += warpStr * Math.sin(p[1] * 2 + t * 0.5) * mx * 0.15;
+        p[1] += warpStr * Math.cos(p[0] * 2 + t * 0.5) * my * 0.15;
+        pp[0] += warpStr * Math.sin(pp[1] * 2 + t * 0.5) * mx * 0.15;
+        pp[1] += warpStr * Math.cos(pp[0] * 2 + t * 0.5) * my * 0.15;
+
+        const progress = i / numPts;
+        ctx.beginPath();
+        ctx.moveTo(cx + pp[0] * scale, cy - pp[1] * scale);
+        ctx.lineTo(cx + p[0] * scale, cy - p[1] * scale);
+
+        const hue = sign > 0 ? 190 + progress * 40 : 200 + progress * 50;
+        ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${0.15 + progress * 0.75})`;
+        ctx.lineWidth = 0.8 + progress * 2.5;
+        ctx.globalAlpha = 1;
+        ctx.stroke();
+      }
+    }
+
+    // Convergence glow points
+    const convX = Math.sqrt(Math.PI / 2) / 2;
+    [[convX, convX], [-convX, -convX]].forEach(([px, py]) => {
+      const gx = cx + px * scale, gy = cy - py * scale;
+      const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, 30);
+      g.addColorStop(0, `rgba(${getCSSVar('--highlight-rgb')}, 0.5)`);
+      g.addColorStop(1, `rgba(${getCSSVar('--highlight-rgb')}, 0)`);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(gx, gy, 30, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ 2. CONFORMAL GRID ═══
+let gridMapType = 'identity';
+function setGridMap(type) {
+  gridMapType = type;
+  document.querySelectorAll('#conformal .ctrl-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+(function() {
+  const canvas = document.getElementById('gridCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+
+  let targetType = 'identity';
+  let morphProgress = 1;
+
+  function applyMap(z, type) {
+    switch (type) {
+      case 'exp': return cExp([z[0]*0.5, z[1]*0.5]);
+      case 'log': {
+        const r = Math.sqrt(z[0]*z[0]+z[1]*z[1]);
+        if (r < 0.01) return [0, 0];
+        return cLog([z[0]+2.5, z[1]]);
+      }
+      case 'inv': return cInv([z[0]+0.01, z[1]+0.01]);
+      case 'sq': return cSq([z[0]*0.4, z[1]*0.4]);
+      case 'euler': return fresnelPoint(z[0] * 1.5 + z[1] * 0.3);
+      default: return z;
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = getCSSVar('--bg');
+    ctx.fillRect(0, 0, W, H);
+
+    const accent = getCSSVar('--accent');
+    const highlight = getCSSVar('--highlight');
+    const t = performance.now() / 1000;
+
+    if (gridMapType !== targetType) {
+      targetType = gridMapType;
+      morphProgress = 0;
+    }
+    morphProgress = Math.min(1, morphProgress + 0.02);
+    const ease = morphProgress < 0.5
+      ? 4 * morphProgress * morphProgress * morphProgress
+      : 1 - Math.pow(-2 * morphProgress + 2, 3) / 2;
+
+    const sc = 80;
+    const gridSize = 8;
+
+    // Horizontal lines
+    for (let i = -gridSize; i <= gridSize; i++) {
+      ctx.beginPath();
+      const steps = 200;
+      for (let j = 0; j <= steps; j++) {
+        const u = (j / steps - 0.5) * gridSize * 2;
+        const v = i * 0.5;
+        const identity = [u * 0.5, v * 0.5];
+        const mapped = applyMap([u * 0.5, v * 0.5], targetType);
+        const x = identity[0] * (1 - ease) + mapped[0] * ease;
+        const y = identity[1] * (1 - ease) + mapped[1] * ease;
+        const px = cx + x * sc;
+        const py = cy - y * sc;
+        if (isNaN(px) || isNaN(py) || Math.abs(px) > 5000 || Math.abs(py) > 5000) continue;
+        j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = accent;
+      ctx.globalAlpha = i === 0 ? 0.5 : 0.2;
+      ctx.lineWidth = i === 0 ? 1.5 : 0.8;
+      ctx.stroke();
+    }
+
+    // Vertical lines
+    for (let i = -gridSize; i <= gridSize; i++) {
+      ctx.beginPath();
+      const steps = 200;
+      for (let j = 0; j <= steps; j++) {
+        const u = i * 0.5;
+        const v = (j / steps - 0.5) * gridSize * 2;
+        const identity = [u * 0.5, v * 0.5];
+        const mapped = applyMap([u * 0.5, v * 0.5], targetType);
+        const x = identity[0] * (1 - ease) + mapped[0] * ease;
+        const y = identity[1] * (1 - ease) + mapped[1] * ease;
+        const px = cx + x * sc;
+        const py = cy - y * sc;
+        if (isNaN(px) || isNaN(py) || Math.abs(px) > 5000 || Math.abs(py) > 5000) continue;
+        j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = highlight;
+      ctx.globalAlpha = i === 0 ? 0.5 : 0.2;
+      ctx.lineWidth = i === 0 ? 1.5 : 0.8;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ 3. DROSTE SPIRAL ═══
+(function() {
+  const canvas = document.getElementById('drosteCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+
+  function draw() {
+    ctx.fillStyle = getCSSVar('--bg');
+    ctx.fillRect(0, 0, W, H);
+
+    const accent = getCSSVar('--accent');
+    const highlight = getCSSVar('--highlight');
+    const muted = getCSSVar('--muted');
+    const t = performance.now() / 1000;
+
+    const angle = parseFloat(document.getElementById('drosteAngle').value);
+    const zoom = parseFloat(document.getElementById('drosteZoom').value);
+    const speed = parseFloat(document.getElementById('drosteSpeed').value);
+
+    const numRings = 40;
+    const numSegments = 200;
+
+    // Draw the Droste spiral grid
+    // Concentric circles that become spiral under log-polar rotation
+    for (let ring = 0; ring < numRings; ring++) {
+      const baseR = 10 + ring * 16;
+      const rFactor = Math.pow(zoom, ring / numRings);
+
+      ctx.beginPath();
+      for (let i = 0; i <= numSegments; i++) {
+        const theta = (i / numSegments) * Math.PI * 2;
+
+        // Apply Droste rotation in log-polar space
+        const logR = Math.log(baseR * rFactor);
+        const newTheta = theta + angle * logR * 0.3 + t * speed * 0.3;
+        const newR = baseR * rFactor * (1 + 0.05 * Math.sin(theta * 4 + ring * 0.5 + t * speed));
+
+        const x = cx + Math.cos(newTheta) * newR;
+        const y = cy + Math.sin(newTheta) * newR;
+
+        if (x < -200 || x > W + 200 || y < -200 || y > H + 200) continue;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+
+      const ringProgress = ring / numRings;
+      const hue = 190 + ringProgress * 60;
+      ctx.strokeStyle = `hsla(${hue}, 70%, 55%, ${0.08 + ringProgress * 0.15})`;
+      ctx.lineWidth = 0.5 + ringProgress * 1;
+      ctx.stroke();
+    }
+
+    // Radial spokes that spiral
+    for (let spoke = 0; spoke < 16; spoke++) {
+      ctx.beginPath();
+      const baseAngle = (spoke / 16) * Math.PI * 2;
+      for (let r = 10; r < 350; r += 2) {
+        const logR = Math.log(r);
+        const theta = baseAngle + angle * logR * 0.3 + t * speed * 0.3;
+        const x = cx + Math.cos(theta) * r;
+        const y = cy + Math.sin(theta) * r;
+        r === 10 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = `hsla(${340 + spoke * 5}, 60%, 60%, 0.12)`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+
+    // Center: the "gallery" recursive rectangle
+    for (let level = 0; level < 6; level++) {
+      const s = 30 * Math.pow(0.6, level);
+      const rot = angle * level * 0.5 + t * speed * 0.2 * (level + 1);
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.strokeStyle = `hsla(${200 + level * 20}, 80%, 65%, ${0.4 - level * 0.06})`;
+      ctx.lineWidth = 1.5 - level * 0.15;
+      ctx.strokeRect(-s, -s, s * 2, s * 2);
+      ctx.restore();
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ 4. EULER + CONFORMAL COMPOSITIONS ═══
+let eulerMode = 'pure';
+function setEulerMode(mode) {
+  eulerMode = mode;
+  document.querySelectorAll('#euler-conformal .ctrl-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+(function() {
+  const canvas = document.getElementById('eulerConfCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2;
+
+  function applyPost(p, mode) {
+    switch (mode) {
+      case 'exp': return cExp([p[0]*0.6, p[1]*0.6]);
+      case 'inv': {
+        const z = [p[0]+0.5, p[1]+0.5];
+        const d = z[0]*z[0]+z[1]*z[1]+0.01;
+        return [z[0]/d * 2, -z[1]/d * 2];
+      }
+      case 'log': {
+        const z = [p[0]+1, p[1]+0.5];
+        const r = Math.sqrt(z[0]*z[0]+z[1]*z[1]);
+        if (r < 0.01) return p;
+        return [Math.log(r)*2, Math.atan2(z[1], z[0])*1.5];
+      }
+      case 'droste': {
+        const r = Math.sqrt(p[0]*p[0]+p[1]*p[1]);
+        const theta = Math.atan2(p[1], p[0]);
+        if (r < 0.01) return p;
+        const logR = Math.log(r + 0.1);
+        const newTheta = theta + logR * 1.5;
+        return [r * Math.cos(newTheta), r * Math.sin(newTheta)];
+      }
+      default: return p;
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = getCSSVar('--bg');
+    ctx.fillRect(0, 0, W, H);
+
+    const accent = getCSSVar('--accent');
+    const highlight = getCSSVar('--highlight');
+    const t = performance.now() / 1000;
+    const scale = 120;
+
+    // Draw multiple layers of the spiral for depth
+    for (let layer = 0; layer < 8; layer++) {
+      const phase = layer * 0.3;
+      const alpha = layer === 0 ? 0.9 : 0.06;
+      const lw = layer === 0 ? 2.5 : 1.5;
+
+      for (let sign = -1; sign <= 1; sign += 2) {
+        const numPts = 1500;
+        const sMax = 6 + Math.sin(t * 0.15 + layer) * 0.5;
+
+        ctx.beginPath();
+        let started = false;
+
+        for (let i = 0; i <= numPts; i++) {
+          const s = sign * (i / numPts) * sMax + phase * 0.1;
+          let p = fresnelPoint(s);
+          p = applyPost(p, eulerMode);
+
+          const px = cx + p[0] * scale;
+          const py = cy - p[1] * scale;
+
+          if (isNaN(px) || isNaN(py) || Math.abs(px - cx) > W || Math.abs(py - cy) > H) {
+            started = false;
+            continue;
+          }
+
+          if (!started) { ctx.moveTo(px, py); started = true; }
+          else ctx.lineTo(px, py);
+        }
+
+        const hue = sign > 0 ? 190 + layer * 8 : 210 + layer * 8;
+        ctx.strokeStyle = `hsla(${hue}, 75%, 60%, ${alpha})`;
+        ctx.lineWidth = lw;
+        ctx.stroke();
+      }
+    }
+
+    // Annotations
+    ctx.globalAlpha = 0.5;
+    ctx.font = '500 0.65rem "JetBrains Mono", monospace';
+    ctx.fillStyle = getCSSVar('--muted');
+    ctx.textAlign = 'left';
+    const labels = {
+      'pure': '∫₀ˢ e^(it²) dt',
+      'exp': 'exp(∫₀ˢ e^(it²) dt)',
+      'inv': '1 / ∫₀ˢ e^(it²) dt',
+      'log': 'log(∫₀ˢ e^(it²) dt)',
+      'droste': 'Droste(∫₀ˢ e^(it²) dt)'
+    };
+    ctx.fillText(labels[eulerMode] || '', 20, 30);
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ 5. ACCELERATION FIELD ═══
+(function() {
+  const canvas = document.getElementById('fieldCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  function draw() {
+    ctx.fillStyle = getCSSVar('--bg');
+    ctx.fillRect(0, 0, W, H);
+
+    const t = performance.now() / 1000;
+    const density = parseInt(document.getElementById('fieldDensity').value);
+    const length = parseFloat(document.getElementById('fieldLength').value);
+    const warp = parseFloat(document.getElementById('fieldWarp').value);
+
+    const cellW = W / density;
+    const cellH = H / density;
+
+    for (let gi = 0; gi < density; gi++) {
+      for (let gj = 0; gj < density; gj++) {
+        const originX = (gi + 0.5) * cellW;
+        const originY = (gj + 0.5) * cellH;
+
+        // Normalize to [-1, 1]
+        const nx = (originX / W - 0.5) * 2;
+        const ny = (originY / H - 0.5) * 2;
+
+        // Each point gets a slightly different spiral orientation
+        const baseAngle = Math.atan2(ny, nx) + t * 0.1;
+
+        const numPts = 60;
+        const sMax = length * (0.5 + 0.5 * Math.cos(nx * Math.PI));
+        const sc = cellW * 0.4;
+
+        ctx.beginPath();
+        let started = false;
+        for (let i = 0; i <= numPts; i++) {
+          const s = (i / numPts) * sMax;
+          let p = fresnelPoint(s, 30);
+
+          // Rotate by base angle
+          const cos = Math.cos(baseAngle), sin = Math.sin(baseAngle);
+          let px = p[0] * cos - p[1] * sin;
+          let py = p[0] * sin + p[1] * cos;
+
+          // Apply conformal warp
+          if (warp > 0.01) {
+            const z = [px + nx * warp, py + ny * warp];
+            const warped = cExp([z[0] * warp * 0.5, z[1] * warp * 0.5]);
+            px = px * (1 - warp) + warped[0] * warp;
+            py = py * (1 - warp) + warped[1] * warp;
+          }
+
+          const x = originX + px * sc;
+          const y = originY - py * sc;
+
+          if (!started) { ctx.moveTo(x, y); started = true; }
+          else ctx.lineTo(x, y);
+        }
+
+        const progress = (gi + gj) / (density * 2);
+        const hue = 190 + progress * 80;
+        const curvatureHere = sMax;
+        const alpha = 0.3 + 0.5 * (curvatureHere / length);
+        ctx.strokeStyle = `hsla(${hue}, 70%, 55%, ${alpha})`;
+        ctx.lineWidth = 1 + curvatureHere * 0.15;
+        ctx.stroke();
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

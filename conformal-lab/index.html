@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>37∞ Conformal Lab — Index</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a1628; --text: #c8e6ff;
+      --accent: #00d4ff; --highlight: #ff6b6b;
+      --muted: #6a9ab8;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(0,212,255,0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px;
+    }
+    .page { max-width: 800px; margin: 0 auto; padding: 60px 24px; position: relative; z-index: 1; }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900; margin-bottom: 0.2em;
+    }
+    h1 sup { font-size: 0.45em; color: var(--highlight); position: relative; top: -0.4em; }
+    .subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic; color: var(--muted);
+      font-size: 1.05rem; max-width: 560px;
+      margin-bottom: 2.5rem; line-height: 1.7;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+
+    .card {
+      display: block; padding: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      text-decoration: none; color: inherit;
+      backdrop-filter: blur(6px);
+      transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 100, 200, 0.1);
+    }
+    .card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700;
+      margin-bottom: 0.4rem; color: var(--accent);
+    }
+    .card p {
+      font-size: 0.88rem; color: var(--muted);
+      line-height: 1.6;
+    }
+    .card .tag {
+      display: inline-block; margin-top: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--highlight); opacity: 0.7;
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--accent);
+      margin: 2.5rem 0 1rem; opacity: 0.7;
+    }
+
+    .back {
+      display: inline-block; margin-top: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
+      transition: color 0.3s;
+    }
+    .back:hover { color: var(--accent); }
+
+    footer {
+      margin-top: 4rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); opacity: 0.5;
+    }
+
+    @media (max-width: 600px) {
+      .page { padding: 40px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a href="../index.html" class="back">&larr; Back to 37&infin;</a>
+
+    <h1 style="margin-top: 1.5rem;">37<sup>&infin;</sup> Conformal Lab</h1>
+    <p class="subtitle">
+      Explorations at the intersection of conformal maps, the Euler spiral,
+      Escher's Print Gallery, and programmatic text layout. Mathematics as
+      medium, typography as topology.
+    </p>
+
+    <p class="section-label">Standalone Visualizations</p>
+    <div class="grid">
+      <a class="card" href="euler-spiral-visualizations.html">
+        <h2>The Euler Spiral: Deliberate Acceleration</h2>
+        <p>Five-section deep dive into ∫₀ˢ e<sup>it²</sup> dt — animated spiral drawing, Fresnel integral graphs, curvature comparison, four artistic renderings (luminous, ribbons, particles, bloom), and the growth metaphor diagram.</p>
+        <span class="tag">canvas &middot; animated &middot; 5 sections</span>
+      </a>
+
+      <a class="card" href="conformal-lab.html">
+        <h2>Conformal Lab: Where Curves Become Worlds</h2>
+        <p>Interactive conformal map explorer — grid transforms (e<sup>z</sup>, log, 1/z, z²), Droste spiral with adjustable parameters, Euler spiral composed with conformal maps, acceleration vector field, and the Conformal Rosetta connecting back to the 37∞ Lab concepts.</p>
+        <span class="tag">interactive &middot; 6 sections &middot; sliders &middot; conformal maps</span>
+      </a>
+
+      <a class="card" href="conformal-text.html">
+        <h2>Conformal Text: Typography on the Curve</h2>
+        <p>Text placed along the Euler spiral with curvature-mapped weight, conformal text grids deformed under complex maps, curvature→typography parameter mapping, Droste recursive text, and text flowing around the spiral as an editorial obstacle.</p>
+        <span class="tag">typography &middot; pretext-inspired &middot; 5 sections</span>
+      </a>
+    </div>
+
+    <p class="section-label">Pretext Fork Demo</p>
+    <div class="grid">
+      <a class="card" href="pretext-demo/euler-spiral-text.html">
+        <h2>Euler Spiral Text (Pretext API)</h2>
+        <p>TypeScript demo using pretext's real <code>prepareWithSegments()</code> and <code>layoutNextLine()</code> APIs. Three modes: flow-around (spiral as obstacle), curvature typography (weight mapped to position), and dual-column (spiral as living gutter). Requires bun dev server to run.</p>
+        <span class="tag">typescript &middot; pretext api &middot; layoutNextLine &middot; zero dom reads</span>
+      </a>
+    </div>
+
+    <p class="section-label">Connections</p>
+    <div class="grid">
+      <div class="card" style="cursor: default;">
+        <h2>Mathematical Thread</h2>
+        <p>The Euler spiral is ∫e<sup>it²</sup>dt — the integrand is a conformal map. Escher's Print Gallery is built from e<sup>z</sup> mapping strips to annuli. The Droste effect is the periodicity of log(z). All conformal maps on C, all preserving local shape while transforming global structure. Pretext's obstacle-routing geometry connects these ideas to programmatic typography.</p>
+      </div>
+      <div class="card" style="cursor: default;">
+        <h2>Key References</h2>
+        <p>
+          <a href="https://3blue1brown.substack.com/p/eschers-most-mathematically-interesting" style="color: var(--accent);">3Blue1Brown: Escher's Print Gallery</a><br>
+          <a href="https://pub.math.leidenuniv.nl/~smitbde//rianne.pdf" style="color: var(--accent);">De Smit & Lenstra: Conformal Grid</a><br>
+          <a href="https://static.laszlokorte.de/escher/" style="color: var(--accent);">Interactive Escher Shader</a><br>
+          <a href="https://github.com/chenglou/pretext" style="color: var(--accent);">chenglou/pretext</a><br>
+          <a href="../lab.html" style="color: var(--accent);">37∞ Lab: 24 Variations</a><br>
+          <a href="../playground.html" style="color: var(--accent);">37∞ Playground</a>
+        </p>
+      </div>
+    </div>
+
+    <footer>Phase Shift &middot; 37&infin; Conformal Lab &middot; Where Curves Become Worlds</footer>
+  </div>
+</body>
+</html>

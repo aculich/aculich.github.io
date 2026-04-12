@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Euler Spiral: Deliberate Acceleration</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: 'Georgia', serif;
+    overflow-x: hidden;
+  }
+  .section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+  }
+  h1 {
+    font-size: 2.4em;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  h2 {
+    font-size: 1.6em;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    margin-bottom: 30px;
+    color: #aaa;
+  }
+  .subtitle {
+    font-size: 1.1em;
+    color: #888;
+    font-style: italic;
+    margin-bottom: 40px;
+  }
+  canvas {
+    border-radius: 8px;
+  }
+  .caption {
+    margin-top: 20px;
+    font-size: 0.95em;
+    color: #777;
+    max-width: 600px;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .integral {
+    font-family: 'Times New Roman', serif;
+    font-size: 1.3em;
+    color: #9ecfff;
+    margin: 15px 0 30px;
+    letter-spacing: 0.04em;
+  }
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #555, transparent);
+    margin: 60px auto;
+  }
+  .controls {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .controls button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #ccc;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85em;
+    transition: all 0.3s;
+  }
+  .controls button:hover {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+  .controls button.active {
+    background: rgba(100,160,255,0.15);
+    border-color: rgba(100,160,255,0.4);
+    color: #9ecfff;
+  }
+  nav {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  nav a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.8em;
+    text-align: right;
+    transition: color 0.3s;
+  }
+  nav a:hover { color: #9ecfff; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#hero">Top</a>
+  <a href="#technical">Technical</a>
+  <a href="#curvature">Curvature</a>
+  <a href="#artistic">Artistic</a>
+  <a href="#growth">Growth</a>
+</nav>
+
+<!-- HERO -->
+<div class="section" id="hero">
+  <h1>The Euler Spiral</h1>
+  <h2>Deliberate Acceleration</h2>
+  <div class="integral">∫₀ˢ e<sup>it²</sup> dt</div>
+  <canvas id="heroCanvas" width="700" height="700"></canvas>
+  <p class="caption">A curve whose curvature increases with distance traveled. Start slow, build gradually, and the spiral tightens into something beautiful.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- TECHNICAL DIAGRAM -->
+<div class="section" id="technical">
+  <h2>Technical: The Fresnel Integrals</h2>
+  <p class="subtitle">x(s) = ∫₀ˢ cos(t²) dt &nbsp;&nbsp;·&nbsp;&nbsp; y(s) = ∫₀ˢ sin(t²) dt</p>
+  <canvas id="techCanvas" width="800" height="500"></canvas>
+  <div class="controls">
+    <button class="active" onclick="setTechView('both')">Both Integrals</button>
+    <button onclick="setTechView('cosine')">C(s) — Cosine Fresnel</button>
+    <button onclick="setTechView('sine')">S(s) — Sine Fresnel</button>
+  </div>
+  <p class="caption">The Fresnel integrals C(s) and S(s) oscillate with decreasing amplitude, converging to ½. These are the x and y coordinates that trace the spiral.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- CURVATURE DIAGRAM -->
+<div class="section" id="curvature">
+  <h2>Curvature: κ = 2s</h2>
+  <p class="subtitle">Linear curvature growth — the signature property</p>
+  <canvas id="curvCanvas" width="800" height="500"></canvas>
+  <p class="caption">Unlike a circle (constant curvature) or a logarithmic spiral (exponential), the Euler spiral's curvature grows linearly. Each step forward adds the same increment of turning — the geometry of steady, compounding progress.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ARTISTIC -->
+<div class="section" id="artistic">
+  <h2>Artistic: The Shape of Momentum</h2>
+  <canvas id="artCanvas" width="800" height="800"></canvas>
+  <div class="controls">
+    <button class="active" onclick="setArtStyle('luminous')">Luminous</button>
+    <button onclick="setArtStyle('ribbons')">Ribbons</button>
+    <button onclick="setArtStyle('particles')">Particles</button>
+    <button onclick="setArtStyle('bloom')">Bloom</button>
+  </div>
+  <p class="caption">The same mathematics, rendered as light, motion, and color.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- GROWTH METAPHOR -->
+<div class="section" id="growth">
+  <h2>The Metaphor: Deliberate Acceleration</h2>
+  <canvas id="growthCanvas" width="800" height="500"></canvas>
+  <p class="caption">Early progress looks linear — almost flat. But the structure of acceleration is already embedded in every step. Patience and momentum aren't opposites; they're the same curve.</p>
+</div>
+
+<script>
+// ===== FRESNEL INTEGRAL COMPUTATION =====
+function fresnelPoint(s, steps) {
+  steps = steps || 500;
+  const dt = s / steps;
+  let x = 0, y = 0;
+  for (let i = 0; i < steps; i++) {
+    const t = (i + 0.5) * dt;
+    x += Math.cos(t * t) * dt;
+    y += Math.sin(t * t) * dt;
+  }
+  return { x, y };
+}
+
+function eulerSpiralPoints(sMax, numPoints) {
+  const points = [];
+  for (let i = 0; i <= numPoints; i++) {
+    const s = (i / numPoints) * sMax;
+    points.push({ s, ...fresnelPoint(s) });
+  }
+  return points;
+}
+
+// ===== HERO ANIMATION =====
+(function() {
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const scale = 160;
+
+  const points = eulerSpiralPoints(8, 2000);
+  // mirror
+  const pointsNeg = eulerSpiralPoints(8, 2000).map(p => ({ s: -p.s, x: -p.x, y: -p.y }));
+
+  let progress = 0;
+  let animating = true;
+
+  function draw() {
+    ctx.fillStyle = 'rgba(10,10,15,0.08)';
+    ctx.fillRect(0, 0, W, H);
+
+    if (animating) {
+      progress = Math.min(progress + 0.003, 1);
+      if (progress >= 1) animating = false;
+    }
+
+    const n = Math.floor(progress * points.length);
+
+    // Draw both halves
+    [points, pointsNeg].forEach((pts, idx) => {
+      const count = Math.min(n, pts.length - 1);
+      for (let i = 1; i <= count; i++) {
+        const t = i / pts.length;
+        const alpha = 0.15 + 0.7 * t;
+        const hue = 210 + t * 60;
+        ctx.beginPath();
+        ctx.moveTo(cx + pts[i-1].x * scale, cy - pts[i-1].y * scale);
+        ctx.lineTo(cx + pts[i].x * scale, cy - pts[i].y * scale);
+        ctx.strokeStyle = `hsla(${hue}, 70%, 65%, ${alpha})`;
+        ctx.lineWidth = 1.2 + t * 2.5;
+        ctx.stroke();
+      }
+
+      // Glow at tip
+      if (count > 0) {
+        const tip = pts[count];
+        const gradient = ctx.createRadialGradient(
+          cx + tip.x * scale, cy - tip.y * scale, 0,
+          cx + tip.x * scale, cy - tip.y * scale, 20
+        );
+        gradient.addColorStop(0, 'rgba(150, 200, 255, 0.6)');
+        gradient.addColorStop(1, 'rgba(150, 200, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(cx + tip.x * scale, cy - tip.y * scale, 20, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    // Convergence points
+    if (progress > 0.7) {
+      const convAlpha = (progress - 0.7) / 0.3;
+      const convX = Math.sqrt(Math.PI / 2) / 2;
+      [[convX, convX], [-convX, -convX]].forEach(([px, py]) => {
+        ctx.beginPath();
+        ctx.arc(cx + px * scale, cy - py * scale, 4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 200, 100, ${convAlpha * 0.8})`;
+        ctx.fill();
+      });
+    }
+
+    // Origin marker
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fill();
+
+    requestAnimationFrame(draw);
+  }
+
+  // Initial clear
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+  draw();
+})();
+
+// ===== TECHNICAL: FRESNEL INTEGRALS GRAPH =====
+let techView = 'both';
+function setTechView(view) {
+  techView = view;
+  document.querySelectorAll('#technical .controls button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  drawTech();
+}
+
+function drawTech() {
+  const canvas = document.getElementById('techCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  const margin = { left: 70, right: 30, top: 30, bottom: 50 };
+  const gw = W - margin.left - margin.right;
+  const gh = H - margin.top - margin.bottom;
+
+  // Compute Fresnel values
+  const sMax = 10;
+  const numPts = 500;
+  const data = [];
+  for (let i = 0; i <= numPts; i++) {
+    const s = (i / numPts) * sMax;
+    const p = fresnelPoint(s);
+    data.push({ s, c: p.x, sn: p.y });
+  }
+
+  // Scales
+  const toX = s => margin.left + (s / sMax) * gw;
+  const toY = v => margin.top + gh / 2 - (v / 1.0) * (gh / 2);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  for (let v = -0.8; v <= 0.8; v += 0.2) {
+    ctx.beginPath();
+    ctx.moveTo(margin.left, toY(v));
+    ctx.lineTo(W - margin.right, toY(v));
+    ctx.stroke();
+  }
+  for (let s = 0; s <= sMax; s += 1) {
+    ctx.beginPath();
+    ctx.moveTo(toX(s), margin.top);
+    ctx.lineTo(toX(s), H - margin.bottom);
+    ctx.stroke();
+  }
+
+  // Axes labels
+  ctx.fillStyle = '#666';
+  ctx.font = '13px Georgia';
+  ctx.textAlign = 'center';
+  for (let s = 0; s <= sMax; s += 2) {
+    ctx.fillText(s, toX(s), H - margin.bottom + 20);
+  }
+  ctx.textAlign = 'right';
+  for (let v = -0.6; v <= 0.6; v += 0.2) {
+    ctx.fillText(v.toFixed(1), margin.left - 10, toY(v) + 4);
+  }
+  ctx.textAlign = 'center';
+  ctx.fillText('arc length s', W / 2, H - 8);
+
+  // 0.5 convergence line
+  ctx.setLineDash([5, 5]);
+  ctx.strokeStyle = 'rgba(255, 200, 100, 0.3)';
+  ctx.beginPath();
+  ctx.moveTo(margin.left, toY(0.5));
+  ctx.lineTo(W - margin.right, toY(0.5));
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255, 200, 100, 0.5)';
+  ctx.textAlign = 'left';
+  ctx.fillText('→ ½', W - margin.right + 5, toY(0.5) + 4);
+
+  // Draw curves
+  function drawCurve(key, color) {
+    ctx.beginPath();
+    data.forEach((d, i) => {
+      const x = toX(d.s), y = toY(d[key]);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
+
+  if (techView === 'both' || techView === 'cosine') {
+    drawCurve('c', 'rgba(100, 180, 255, 0.9)');
+    ctx.fillStyle = 'rgba(100, 180, 255, 0.7)';
+    ctx.font = '14px Georgia';
+    ctx.textAlign = 'left';
+    ctx.fillText('C(s) = ∫cos(t²)dt', margin.left + 10, margin.top + 20);
+  }
+  if (techView === 'both' || techView === 'sine') {
+    drawCurve('sn', 'rgba(255, 130, 180, 0.9)');
+    ctx.fillStyle = 'rgba(255, 130, 180, 0.7)';
+    ctx.font = '14px Georgia';
+    ctx.textAlign = 'left';
+    ctx.fillText('S(s) = ∫sin(t²)dt', margin.left + 10, margin.top + 40);
+  }
+}
+drawTech();
+
+// ===== CURVATURE DIAGRAM =====
+(function() {
+  const canvas = document.getElementById('curvCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  const margin = { left: 70, right: 30, top: 30, bottom: 50 };
+  const gw = W - margin.left - margin.right;
+  const gh = H - margin.top - margin.bottom;
+
+  const sMax = 6;
+  const kMax = 12;
+
+  const toX = s => margin.left + (s / sMax) * gw;
+  const toY = k => margin.top + gh - (k / kMax) * gh;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  for (let k = 0; k <= kMax; k += 2) {
+    ctx.beginPath(); ctx.moveTo(margin.left, toY(k)); ctx.lineTo(W - margin.right, toY(k)); ctx.stroke();
+  }
+  for (let s = 0; s <= sMax; s += 1) {
+    ctx.beginPath(); ctx.moveTo(toX(s), margin.top); ctx.lineTo(toX(s), H - margin.bottom); ctx.stroke();
+  }
+
+  // Labels
+  ctx.fillStyle = '#666';
+  ctx.font = '13px Georgia';
+  ctx.textAlign = 'center';
+  for (let s = 0; s <= sMax; s += 1) ctx.fillText(s, toX(s), H - margin.bottom + 20);
+  ctx.textAlign = 'right';
+  for (let k = 0; k <= kMax; k += 2) ctx.fillText(k, margin.left - 10, toY(k) + 4);
+  ctx.textAlign = 'center';
+  ctx.fillText('arc length s', W / 2, H - 8);
+  ctx.save();
+  ctx.translate(15, margin.top + gh / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('curvature κ', 0, 0);
+  ctx.restore();
+
+  // Circle (constant)
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(3));
+  ctx.lineTo(toX(sMax), toY(3));
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([8, 6]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '12px Georgia';
+  ctx.textAlign = 'left';
+  ctx.fillText('Circle (constant κ)', toX(sMax) - 130, toY(3) - 8);
+
+  // Euler spiral (linear)
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const s = (i / 200) * sMax;
+    const k = 2 * s;
+    const x = toX(s), y = toY(k);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = 'rgba(100, 200, 255, 0.9)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.7)';
+  ctx.font = '13px Georgia';
+  ctx.fillText('Euler spiral: κ = 2s', toX(3.5), toY(8.5));
+
+  // Logarithmic spiral (exponential)
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const s = (i / 200) * sMax;
+    const k = 0.5 * Math.exp(0.5 * s);
+    if (k > kMax) break;
+    const x = toX(s), y = toY(k);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = 'rgba(255, 150, 100, 0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255, 150, 100, 0.5)';
+  ctx.font = '12px Georgia';
+  ctx.fillText('Log spiral (exponential κ)', toX(1.5), toY(4.5));
+})();
+
+// ===== ARTISTIC VISUALIZATIONS =====
+let artStyle = 'luminous';
+let artAnim = null;
+
+function setArtStyle(style) {
+  artStyle = style;
+  document.querySelectorAll('#artistic .controls button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  if (artAnim) cancelAnimationFrame(artAnim);
+  drawArt();
+}
+
+function drawArt() {
+  const canvas = document.getElementById('artCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  if (artStyle === 'luminous') drawLuminous(ctx, W, H, cx, cy);
+  else if (artStyle === 'ribbons') drawRibbons(ctx, W, H, cx, cy);
+  else if (artStyle === 'particles') drawParticles(ctx, W, H, cx, cy);
+  else if (artStyle === 'bloom') drawBloom(ctx, W, H, cx, cy);
+}
+
+function drawLuminous(ctx, W, H, cx, cy) {
+  const scale = 130;
+  // Multiple overlapping spirals with different phases
+  for (let layer = 0; layer < 20; layer++) {
+    const phase = layer * 0.15;
+    const hueBase = 200 + layer * 8;
+    const pts = [];
+    for (let i = 0; i <= 1500; i++) {
+      const s = (i / 1500) * 7 + phase * 0.3;
+      const p = fresnelPoint(s);
+      pts.push(p);
+    }
+
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = cx + p.x * scale;
+      const y = cy - p.y * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `hsla(${hueBase}, 80%, 60%, ${0.08})`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Negative side
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = cx - p.x * scale;
+      const y = cy + p.y * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `hsla(${hueBase + 30}, 80%, 60%, ${0.08})`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
+  // Bright core spiral
+  const corePoints = eulerSpiralPoints(7, 2000);
+  for (let i = 1; i < corePoints.length; i++) {
+    const t = i / corePoints.length;
+    ctx.beginPath();
+    ctx.moveTo(cx + corePoints[i-1].x * scale, cy - corePoints[i-1].y * scale);
+    ctx.lineTo(cx + corePoints[i].x * scale, cy - corePoints[i].y * scale);
+    ctx.strokeStyle = `hsla(${210 + t * 80}, 90%, 70%, ${0.5 + t * 0.4})`;
+    ctx.lineWidth = 1 + t * 3;
+    ctx.stroke();
+    // Mirror
+    ctx.beginPath();
+    ctx.moveTo(cx - corePoints[i-1].x * scale, cy + corePoints[i-1].y * scale);
+    ctx.lineTo(cx - corePoints[i].x * scale, cy + corePoints[i].y * scale);
+    ctx.strokeStyle = `hsla(${220 + t * 80}, 90%, 70%, ${0.5 + t * 0.4})`;
+    ctx.lineWidth = 1 + t * 3;
+    ctx.stroke();
+  }
+
+  // Convergence glow
+  const convX = Math.sqrt(Math.PI / 2) / 2;
+  [[convX, convX], [-convX, -convX]].forEach(([px, py]) => {
+    const gradient = ctx.createRadialGradient(
+      cx + px * scale, cy - py * scale, 0,
+      cx + px * scale, cy - py * scale, 50
+    );
+    gradient.addColorStop(0, 'rgba(255, 220, 150, 0.4)');
+    gradient.addColorStop(0.5, 'rgba(255, 180, 100, 0.1)');
+    gradient.addColorStop(1, 'rgba(255, 150, 80, 0)');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(cx + px * scale, cy - py * scale, 50, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawRibbons(ctx, W, H, cx, cy) {
+  const scale = 130;
+  const numRibbons = 30;
+
+  for (let r = 0; r < numRibbons; r++) {
+    const offset = (r - numRibbons / 2) * 0.04;
+    const hue = 190 + r * 5;
+    const pts = eulerSpiralPoints(7, 1000);
+
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const t = i / pts.length;
+      const nx = -Math.sin(t * 20) * offset;
+      const ny = Math.cos(t * 20) * offset;
+      const x = cx + (p.x + nx) * scale;
+      const y = cy - (p.y + ny) * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `hsla(${hue}, 70%, 55%, 0.15)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Mirror
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const t = i / pts.length;
+      const nx = -Math.sin(t * 20) * offset;
+      const ny = Math.cos(t * 20) * offset;
+      const x = cx - (p.x + nx) * scale;
+      const y = cy + (p.y + ny) * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `hsla(${hue + 40}, 70%, 55%, 0.15)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+}
+
+function drawParticles(ctx, W, H, cx, cy) {
+  const scale = 130;
+  const pts = eulerSpiralPoints(7, 3000);
+  const ptsNeg = pts.map(p => ({ x: -p.x, y: -p.y, s: -p.s }));
+
+  // Background trail
+  [pts, ptsNeg].forEach((points, side) => {
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      const x = cx + p.x * scale;
+      const y = cy - p.y * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = 'rgba(100, 160, 255, 0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Particles along the curve
+  [pts, ptsNeg].forEach((points, side) => {
+    for (let i = 0; i < points.length; i += 8) {
+      const t = i / points.length;
+      const p = points[i];
+      const x = cx + p.x * scale;
+      const y = cy - p.y * scale;
+      const size = 0.5 + t * 3;
+      const alpha = 0.2 + t * 0.6;
+      const hue = side === 0 ? 210 + t * 60 : 250 + t * 60;
+
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${hue}, 80%, 70%, ${alpha})`;
+      ctx.fill();
+
+      // Glow for larger particles
+      if (size > 2) {
+        const g = ctx.createRadialGradient(x, y, 0, x, y, size * 3);
+        g.addColorStop(0, `hsla(${hue}, 80%, 70%, ${alpha * 0.3})`);
+        g.addColorStop(1, `hsla(${hue}, 80%, 70%, 0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, size * 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  });
+}
+
+function drawBloom(ctx, W, H, cx, cy) {
+  const scale = 110;
+
+  // Multiple rotated copies of the spiral
+  for (let rot = 0; rot < 12; rot++) {
+    const angle = (rot / 12) * Math.PI * 2;
+    const hue = (rot / 12) * 360;
+    const pts = eulerSpiralPoints(6, 800);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = p.x * scale;
+      const y = -p.y * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `hsla(${hue}, 70%, 60%, 0.25)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Inner glow line
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = p.x * scale;
+      const y = -p.y * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = `hsla(${hue}, 90%, 80%, 0.1)`;
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // Center glow
+  const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80);
+  cg.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+  cg.addColorStop(0.5, 'rgba(200, 200, 255, 0.05)');
+  cg.addColorStop(1, 'rgba(200, 200, 255, 0)');
+  ctx.fillStyle = cg;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 80, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+drawArt();
+
+// ===== GROWTH METAPHOR =====
+(function() {
+  const canvas = document.getElementById('growthCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  const margin = { left: 70, right: 30, top: 40, bottom: 50 };
+  const gw = W - margin.left - margin.right;
+  const gh = H - margin.top - margin.bottom;
+
+  // We'll plot cumulative curvature (total turning) = s²
+  // vs. distance traveled s
+  const sMax = 5;
+  const turnMax = sMax * sMax;
+
+  const toX = s => margin.left + (s / sMax) * gw;
+  const toY = v => margin.top + gh - (v / turnMax) * gh;
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  for (let i = 0; i <= 5; i++) {
+    const v = (i / 5) * turnMax;
+    ctx.beginPath(); ctx.moveTo(margin.left, toY(v)); ctx.lineTo(W - margin.right, toY(v)); ctx.stroke();
+  }
+
+  // "Looks linear here" zone
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.03)';
+  ctx.fillRect(margin.left, margin.top, gw * 0.3, gh);
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.3)';
+  ctx.font = '12px Georgia';
+  ctx.textAlign = 'center';
+  ctx.fillText('← feels slow', margin.left + gw * 0.15, margin.top + 20);
+
+  // "Acceleration visible" zone
+  ctx.fillStyle = 'rgba(255, 180, 100, 0.03)';
+  ctx.fillRect(margin.left + gw * 0.5, margin.top, gw * 0.5, gh);
+  ctx.fillStyle = 'rgba(255, 180, 100, 0.3)';
+  ctx.fillText('momentum visible →', margin.left + gw * 0.75, margin.top + 20);
+
+  // Cumulative turning: ∫κ ds = ∫2s ds = s²
+  ctx.beginPath();
+  for (let i = 0; i <= 400; i++) {
+    const s = (i / 400) * sMax;
+    const turn = s * s;
+    const x = toX(s), y = toY(turn);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  const grad = ctx.createLinearGradient(margin.left, 0, W - margin.right, 0);
+  grad.addColorStop(0, 'rgba(100, 180, 255, 0.9)');
+  grad.addColorStop(1, 'rgba(255, 180, 100, 0.9)');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Linear reference
+  ctx.setLineDash([6, 6]);
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(0));
+  ctx.lineTo(toX(sMax), toY(sMax * 2));
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.font = '11px Georgia';
+  ctx.textAlign = 'left';
+  ctx.fillText('linear growth', toX(sMax) - 80, toY(sMax * 2) - 10);
+
+  // Labels
+  ctx.fillStyle = '#666';
+  ctx.font = '13px Georgia';
+  ctx.textAlign = 'center';
+  ctx.fillText('steps taken', W / 2, H - 8);
+  ctx.save();
+  ctx.translate(15, margin.top + gh / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('total transformation', 0, 0);
+  ctx.restore();
+
+  // Label the curve
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.7)';
+  ctx.font = '13px Georgia';
+  ctx.textAlign = 'left';
+  ctx.fillText('cumulative turning = s²', toX(2.5), toY(8));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>37∞ Conformal Text — Where Typography Meets Topology</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1628;
+    --text: #c8e6ff;
+    --accent: #00d4ff;
+    --highlight: #ff6b6b;
+    --muted: #6a9ab8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px;
+  }
+  .section {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 50px 20px;
+    position: relative;
+  }
+  .section-short { min-height: 60vh; }
+  h1, h2 {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    font-weight: 900;
+  }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 0.3em; }
+  h2 { font-size: clamp(1.3rem, 3vw, 1.8rem); margin-bottom: 0.4em; }
+  .subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic; font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 560px; text-align: center;
+    margin-bottom: 1.8rem; line-height: 1.7;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+  canvas { border-radius: 6px; max-width: 100%; display: block; }
+  .caption {
+    margin-top: 1rem; font-size: 0.85rem;
+    color: var(--muted); max-width: 540px;
+    text-align: center; line-height: 1.6;
+  }
+  .ctrl-row {
+    display: flex; gap: 10px; margin-top: 14px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .ctrl-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(0,212,255,0.15);
+    color: var(--muted); padding: 5px 16px;
+    border-radius: 18px; cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.06em;
+    transition: all 0.3s;
+  }
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--text); }
+  .ctrl-btn.active {
+    background: rgba(0,212,255,0.12);
+    border-color: var(--accent); color: var(--accent);
+  }
+  .slider-row {
+    display: flex; gap: 16px; margin-top: 12px;
+    align-items: center; flex-wrap: wrap; justify-content: center;
+  }
+  .slider-group { display: flex; align-items: center; gap: 6px; }
+  .slider-group label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  input[type="range"] {
+    -webkit-appearance: none; width: 100px; height: 3px;
+    background: rgba(0,212,255,0.15); border-radius: 2px; outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 11px; height: 11px;
+    background: var(--accent); border-radius: 50%; cursor: pointer;
+  }
+  .divider {
+    width: 50px; height: 1px; margin: 20px auto;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.2), transparent);
+  }
+  footer {
+    text-align: center; padding: 2rem; opacity: 0.4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.5rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ 1. TEXT ON THE EULER SPIRAL ═══ -->
+<div class="section" id="spiral-text">
+  <h1>37<sup style="font-size:0.5em; color:var(--highlight);">&infin;</sup> Conformal Text</h1>
+  <h2 style="font-weight:400; color:var(--muted);">Typography on the Curve of Deliberate Acceleration</h2>
+  <p class="subtitle">Each character placed at its Fresnel integral coordinate, rotated to the local tangent. As curvature increases, the text tightens — the message becomes the medium.</p>
+  <canvas id="spiralTextCanvas" width="900" height="900"></canvas>
+  <div class="ctrl-row" id="spiralTextCtrls">
+    <button class="ctrl-btn active" data-text="default">Deliberate Acceleration</button>
+    <button class="ctrl-btn" data-text="euler">The Euler Spiral</button>
+    <button class="ctrl-btn" data-text="math">∫₀ˢ e^(it²) dt · A curve whose curvature increases with distance</button>
+    <button class="ctrl-btn" data-text="custom">Custom…</button>
+  </div>
+  <div class="slider-row">
+    <div class="slider-group">
+      <label>length</label>
+      <input type="range" id="spiralLen" min="2" max="10" step="0.1" value="6">
+    </div>
+    <div class="slider-group">
+      <label>size</label>
+      <input type="range" id="spiralSize" min="8" max="36" step="1" value="18">
+    </div>
+    <div class="slider-group">
+      <label>weight</label>
+      <input type="range" id="spiralWeight" min="0" max="1" step="0.05" value="0.6">
+    </div>
+  </div>
+  <p class="caption">The font weight increases with curvature — light at the origin, bold at the convergence points. Inspired by pretext's variable-typographic-ascii demo, but driven by mathematics instead of brightness.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ 2. CONFORMAL TEXT GRID ═══ -->
+<div class="section" id="grid-text">
+  <h2>Conformal Text Grid</h2>
+  <p class="subtitle">A grid of words, deformed under conformal maps. Each cell contains a fragment of text — watch the words warp while remaining locally legible. Angles preserved, meaning intact.</p>
+  <canvas id="gridTextCanvas" width="900" height="700"></canvas>
+  <div class="ctrl-row" id="gridTextCtrls">
+    <button class="ctrl-btn active" data-map="identity">Identity</button>
+    <button class="ctrl-btn" data-map="exp">e<sup>z</sup></button>
+    <button class="ctrl-btn" data-map="log">log(z)</button>
+    <button class="ctrl-btn" data-map="inv">1/z</button>
+    <button class="ctrl-btn" data-map="spiral">Euler Flow</button>
+    <button class="ctrl-btn" data-map="droste">Droste</button>
+  </div>
+  <p class="caption">Like pretext's editorial-engine demo, but the "obstacle" is the conformal map itself — space bends, and text bends with it.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ 3. CURVATURE TYPOGRAPHY ═══ -->
+<div class="section section-short" id="curv-type">
+  <h2>Curvature → Typography</h2>
+  <p class="subtitle">Mapping mathematical curvature to typographic parameters: weight, size, spacing, and opacity. The text embodies its own meaning — "acceleration" literally accelerates.</p>
+  <canvas id="curvTypeCanvas" width="900" height="400"></canvas>
+  <div class="slider-row">
+    <div class="slider-group">
+      <label>weight map</label>
+      <input type="range" id="ctWeight" min="0" max="1" step="0.05" value="0.8">
+    </div>
+    <div class="slider-group">
+      <label>size map</label>
+      <input type="range" id="ctSize" min="0" max="1" step="0.05" value="0.4">
+    </div>
+    <div class="slider-group">
+      <label>spacing map</label>
+      <input type="range" id="ctSpacing" min="0" max="1" step="0.05" value="0.3">
+    </div>
+  </div>
+  <p class="caption">Three channels of typographic variation, all driven by one parameter: arc length s. The same "deliberate acceleration" that governs the Euler spiral now governs the letterforms.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ 4. DROSTE TEXT ═══ -->
+<div class="section" id="droste-text">
+  <h2>Droste Text</h2>
+  <p class="subtitle">Text that contains itself. Each level of recursion is measured and placed at the correct scale, spiraling inward — Escher's Print Gallery, but with words.</p>
+  <canvas id="drosteTextCanvas" width="800" height="800"></canvas>
+  <div class="slider-row">
+    <div class="slider-group">
+      <label>levels</label>
+      <input type="range" id="drosteLevels" min="2" max="8" step="1" value="5">
+    </div>
+    <div class="slider-group">
+      <label>rotation</label>
+      <input type="range" id="drosteRot" min="0" max="6.28" step="0.05" value="0.5">
+    </div>
+    <div class="slider-group">
+      <label>scale</label>
+      <input type="range" id="drosteScale" min="0.3" max="0.7" step="0.02" value="0.5">
+    </div>
+  </div>
+  <p class="caption">At each recursive level, text is re-measured for the available width — the same principle as pretext's shrinkwrap binary search, applied recursively within a log-spiral frame.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══ 5. TEXT FLOWING AROUND THE SPIRAL ═══ -->
+<div class="section" id="flow-text">
+  <h2>Text Flowing Around the Curve</h2>
+  <p class="subtitle">An Euler spiral as an editorial obstacle. Text reflows line by line, each line carved by the spiral's presence — pretext's obstacle-routing geometry meets the clothoid.</p>
+  <canvas id="flowTextCanvas" width="900" height="700"></canvas>
+  <div class="slider-row">
+    <div class="slider-group">
+      <label>spiral size</label>
+      <input type="range" id="flowSize" min="50" max="250" step="5" value="140">
+    </div>
+    <div class="slider-group">
+      <label>line height</label>
+      <input type="range" id="flowLH" min="16" max="36" step="1" value="22">
+    </div>
+  </div>
+  <p class="caption">Each line is carved by the spiral's bounding interval at that y-coordinate, exactly like pretext's dynamic-layout demo carves text around SVG logos — but the "logo" is ∫₀ˢ e^(it²) dt.</p>
+</div>
+
+<footer>Phase Shift · 37∞ Conformal Text · Where Typography Meets Topology</footer>
+
+<script>
+'use strict';
+
+// ═══ MATH HELPERS ═══
+function fresnelPoint(s, steps) {
+  steps = steps || Math.max(80, Math.floor(Math.abs(s) * 50));
+  const dt = s / steps;
+  let x = 0, y = 0;
+  for (let i = 0; i < steps; i++) {
+    const t = (i + 0.5) * dt;
+    x += Math.cos(t * t) * dt;
+    y += Math.sin(t * t) * dt;
+  }
+  return [x, y];
+}
+
+function fresnelTangent(s) {
+  return [Math.cos(s * s), Math.sin(s * s)];
+}
+
+function fresnelCurvature(s) {
+  return 2 * Math.abs(s);
+}
+
+// ═══ SECTION 1: TEXT ON THE EULER SPIRAL ═══
+(function() {
+  const canvas = document.getElementById('spiralTextCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+
+  const texts = {
+    default: 'Start slow, build gradually, and the spiral tightens into something beautiful. The shape of deliberate acceleration. Every step adds the same increment of turning — patience and momentum are the same curve. Start slow, build gradually, and the spiral tightens into something beautiful again.',
+    euler: 'The Euler Spiral — also called the Cornu spiral or clothoid — is a curve whose curvature increases linearly with arc length. At the origin, it is essentially a straight line. As you travel along it, it bends more and more, not in jumps, but in perfect proportion to distance traveled. Civil engineers use it for highway design. Mathematicians love it for its elegance. We use it as a shape for how good work unfolds.',
+    math: '∫₀ˢ e^(it²) dt — The Fresnel integral defines a conformal map from the real line into C. The real part x(s) = ∫₀ˢ cos(t²) dt and imaginary part y(s) = ∫₀ˢ sin(t²) dt oscillate with decreasing amplitude, converging to (√(π/2)/2, √(π/2)/2). Curvature κ = 2s grows linearly. Each step forward adds the same increment of turning.',
+    custom: 'Type your own text here...'
+  };
+
+  let currentText = texts.default;
+  let customInput = null;
+
+  document.querySelectorAll('#spiralTextCtrls .ctrl-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#spiralTextCtrls .ctrl-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const key = btn.dataset.text;
+      if (key === 'custom') {
+        const txt = prompt('Enter text to spiral:', currentText);
+        if (txt) currentText = txt;
+      } else {
+        currentText = texts[key];
+      }
+    });
+  });
+
+  function draw() {
+    ctx.fillStyle = '#0a1628';
+    ctx.fillRect(0, 0, W, H);
+    const t = performance.now() / 1000;
+
+    const sLen = parseFloat(document.getElementById('spiralLen').value);
+    const baseSize = parseFloat(document.getElementById('spiralSize').value);
+    const weightInfluence = parseFloat(document.getElementById('spiralWeight').value);
+    const scale = 110;
+
+    // Compute total arc length in pixels, then distribute characters
+    const sampleN = 2000;
+    const points = [];
+    let totalArcPx = 0;
+
+    for (let i = 0; i <= sampleN; i++) {
+      const s = (i / sampleN) * sLen;
+      const [px, py] = fresnelPoint(s);
+      points.push({ s, x: cx + px * scale, y: cy - py * scale });
+      if (i > 0) {
+        const dx = points[i].x - points[i-1].x;
+        const dy = points[i].y - points[i-1].y;
+        totalArcPx += Math.sqrt(dx * dx + dy * dy);
+      }
+    }
+
+    // Cumulative arc lengths
+    const arcLens = [0];
+    for (let i = 1; i < points.length; i++) {
+      const dx = points[i].x - points[i-1].x;
+      const dy = points[i].y - points[i-1].y;
+      arcLens.push(arcLens[i-1] + Math.sqrt(dx * dx + dy * dy));
+    }
+
+    // Draw faint spiral path for both sides
+    ctx.globalAlpha = 0.08;
+    ctx.beginPath();
+    points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Mirror side
+    ctx.beginPath();
+    for (let i = 0; i <= sampleN; i++) {
+      const s = (i / sampleN) * sLen;
+      const [px, py] = fresnelPoint(-s);
+      const x = cx + px * scale, y = cy - py * scale;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Place characters along positive spiral
+    const chars = currentText.split('');
+    let charIdx = 0;
+    const avgCharWidth = baseSize * 0.55;
+    let targetDist = avgCharWidth * 0.3; // start a little in
+
+    for (let ci = 0; ci < chars.length && ci < 600; ci++) {
+      // Find point at targetDist along arc
+      let ptIdx = 0;
+      for (let i = 1; i < arcLens.length; i++) {
+        if (arcLens[i] >= targetDist) { ptIdx = i; break; }
+        if (i === arcLens.length - 1) ptIdx = i;
+      }
+
+      if (ptIdx >= points.length - 1) break;
+
+      const p = points[ptIdx];
+      const s = p.s;
+
+      // Tangent angle
+      const tang = fresnelTangent(s);
+      const angle = -Math.atan2(tang[1], tang[0]); // negative because canvas y is flipped
+
+      // Curvature-driven typography
+      const kappa = fresnelCurvature(s);
+      const maxKappa = fresnelCurvature(sLen);
+      const kappaFrac = Math.min(1, kappa / (maxKappa * 0.6));
+
+      // Weight: 300 (light) → 700 (bold) based on curvature
+      const weight = Math.round(300 + 400 * kappaFrac * weightInfluence);
+      // Size variation
+      const size = baseSize * (1 + kappaFrac * 0.15);
+      // Alpha: from 0.4 to 1
+      const alpha = 0.35 + 0.65 * Math.min(1, kappaFrac * 1.5 + 0.1);
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(angle);
+
+      ctx.font = `${weight} ${size}px "DM Sans", sans-serif`;
+      ctx.fillStyle = `rgba(200, 230, 255, ${alpha})`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+      ctx.fillText(chars[ci], 0, 0);
+
+      // Measure this character for spacing
+      const charW = ctx.measureText(chars[ci]).width;
+      ctx.restore();
+
+      targetDist += charW * 0.95 + 1;
+    }
+
+    // Place characters along negative spiral too (continuing the text)
+    const negPoints = [];
+    const negArcLens = [0];
+    for (let i = 0; i <= sampleN; i++) {
+      const s = -(i / sampleN) * sLen;
+      const [px, py] = fresnelPoint(s);
+      negPoints.push({ s, x: cx + px * scale, y: cy - py * scale });
+      if (i > 0) {
+        const dx = negPoints[i].x - negPoints[i-1].x;
+        const dy = negPoints[i].y - negPoints[i-1].y;
+        negArcLens.push(negArcLens[i-1] + Math.sqrt(dx * dx + dy * dy));
+      }
+    }
+
+    targetDist = avgCharWidth * 0.3;
+    const chars2 = currentText.split('').reverse();
+    for (let ci = 0; ci < chars2.length && ci < 600; ci++) {
+      let ptIdx = 0;
+      for (let i = 1; i < negArcLens.length; i++) {
+        if (negArcLens[i] >= targetDist) { ptIdx = i; break; }
+        if (i === negArcLens.length - 1) ptIdx = i;
+      }
+      if (ptIdx >= negPoints.length - 1) break;
+
+      const p = negPoints[ptIdx];
+      const s = Math.abs(p.s);
+      const tang = fresnelTangent(-s);
+      const angle = -Math.atan2(-tang[1], -tang[0]);
+      const kappa = fresnelCurvature(s);
+      const maxKappa = fresnelCurvature(sLen);
+      const kappaFrac = Math.min(1, kappa / (maxKappa * 0.6));
+      const weight = Math.round(300 + 400 * kappaFrac * weightInfluence);
+      const size = baseSize * (1 + kappaFrac * 0.15);
+      const alpha = 0.35 + 0.65 * Math.min(1, kappaFrac * 1.5 + 0.1);
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(angle);
+      ctx.font = `${weight} ${size}px "DM Sans", sans-serif`;
+      ctx.fillStyle = `rgba(200, 230, 255, ${alpha})`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+      ctx.fillText(chars2[ci], 0, 0);
+      const charW = ctx.measureText(chars2[ci]).width;
+      ctx.restore();
+      targetDist += charW * 0.95 + 1;
+    }
+
+    // Convergence glow
+    const convX = Math.sqrt(Math.PI / 2) / 2;
+    [[convX, convX], [-convX, -convX]].forEach(([px, py]) => {
+      const gx = cx + px * scale, gy = cy - py * scale;
+      const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, 25);
+      g.addColorStop(0, 'rgba(255, 107, 107, 0.35)');
+      g.addColorStop(1, 'rgba(255, 107, 107, 0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(gx, gy, 25, 0, Math.PI * 2); ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ SECTION 2: CONFORMAL TEXT GRID ═══
+(function() {
+  const canvas = document.getElementById('gridTextCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+
+  let currentMap = 'identity';
+  let morphT = 1;
+  let prevMap = 'identity';
+
+  const words = [
+    'objects', 'morphisms', 'functors', 'limits', 'colimits',
+    'homotopy', 'cobordism', 'topology', 'algebra', 'analysis',
+    'curvature', 'manifold', 'bundle', 'sheaf', 'spectrum',
+    'boundary', 'interior', 'closure', 'compact', 'connected',
+    'conformal', 'harmonic', 'holomorphic', 'meromorphic', 'analytic',
+    'category', 'natural', 'adjoint', 'monad', 'fiber',
+    'symmetry', 'invariant', 'equivariant', 'covariant', 'contravariant',
+    'commute', 'exact', 'sequence', 'complex', 'homology'
+  ];
+
+  document.querySelectorAll('#gridTextCtrls .ctrl-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#gridTextCtrls .ctrl-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      prevMap = currentMap;
+      currentMap = btn.dataset.map;
+      morphT = 0;
+    });
+  });
+
+  function applyMap(u, v, type) {
+    switch (type) {
+      case 'exp': {
+        const r = Math.exp(u * 0.4);
+        return [r * Math.cos(v * 0.4), r * Math.sin(v * 0.4)];
+      }
+      case 'log': {
+        const zu = u + 3, zv = v;
+        const r = Math.sqrt(zu*zu + zv*zv);
+        if (r < 0.01) return [u, v];
+        return [Math.log(r) * 2, Math.atan2(zv, zu) * 2];
+      }
+      case 'inv': {
+        const zu = u + 0.5, zv = v + 0.5;
+        const d = zu*zu + zv*zv + 0.1;
+        return [zu/d * 3, -zv/d * 3];
+      }
+      case 'spiral': {
+        const s = u * 0.8 + v * 0.3;
+        const p = fresnelPoint(s, 80);
+        return [p[0] * 3 + v * 0.2, p[1] * 3 - u * 0.2];
+      }
+      case 'droste': {
+        const r = Math.sqrt(u*u + v*v) + 0.5;
+        const theta = Math.atan2(v, u);
+        const logR = Math.log(r);
+        const newTheta = theta + logR * 0.8;
+        return [r * Math.cos(newTheta), r * Math.sin(newTheta)];
+      }
+      default: return [u, v];
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0a1628';
+    ctx.fillRect(0, 0, W, H);
+
+    morphT = Math.min(1, morphT + 0.025);
+    const ease = morphT < 0.5 ? 4*morphT*morphT*morphT : 1 - Math.pow(-2*morphT+2,3)/2;
+
+    const gridN = 8;
+    const cellScale = 70;
+    let wordIdx = 0;
+
+    for (let gi = -gridN/2; gi < gridN/2; gi++) {
+      for (let gj = -gridN/2; gj < gridN/2; gj++) {
+        const u = gi * 0.8;
+        const v = gj * 0.8;
+
+        const id = [u, v];
+        const mp = applyMap(u, v, currentMap);
+        const pp = applyMap(u, v, prevMap);
+
+        // Interpolate between previous and current map
+        const x = (pp[0] * (1 - ease) + mp[0] * ease) * cellScale;
+        const y = (pp[1] * (1 - ease) + mp[1] * ease) * cellScale;
+
+        // Compute local scale from Jacobian approximation
+        const eps = 0.01;
+        const m_du = applyMap(u + eps, v, currentMap);
+        const m_u0 = applyMap(u, v, currentMap);
+        const m_dv = applyMap(u, v + eps, currentMap);
+        const dxdu = (m_du[0] - m_u0[0]) / eps;
+        const dydu = (m_du[1] - m_u0[1]) / eps;
+        const dxdv = (m_dv[0] - m_u0[0]) / eps;
+        const dydv = (m_dv[1] - m_u0[1]) / eps;
+        const localScale = Math.sqrt(Math.abs(dxdu * dydv - dydu * dxdv));
+        const angle = Math.atan2(dydu, dxdu);
+
+        const word = words[wordIdx % words.length];
+        wordIdx++;
+
+        const sz = Math.max(5, Math.min(18, 11 * localScale));
+        const alpha = Math.max(0.1, Math.min(0.9, localScale * 0.6));
+
+        ctx.save();
+        ctx.translate(cx + x, cy - y);
+
+        // Blend rotation in
+        const displayAngle = -angle * ease;
+        ctx.rotate(displayAngle);
+
+        ctx.font = `400 ${sz}px "JetBrains Mono", monospace`;
+        ctx.fillStyle = `rgba(200, 230, 255, ${alpha})`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(word, 0, 0);
+        ctx.restore();
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ SECTION 3: CURVATURE TYPOGRAPHY ═══
+(function() {
+  const canvas = document.getElementById('curvTypeCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const text = 'A curve whose curvature increases with distance. Start slow, build gradually, and the spiral tightens into something beautiful. The shape of deliberate acceleration.';
+
+  function draw() {
+    ctx.fillStyle = '#0a1628';
+    ctx.fillRect(0, 0, W, H);
+
+    const wMap = parseFloat(document.getElementById('ctWeight').value);
+    const sMap = parseFloat(document.getElementById('ctSize').value);
+    const spMap = parseFloat(document.getElementById('ctSpacing').value);
+
+    const chars = text.split('');
+    const n = chars.length;
+    const baseSize = 22;
+    const margin = 60;
+    let x = margin;
+    let y = H * 0.35;
+
+    // Draw curvature graph underneath
+    ctx.globalAlpha = 0.08;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      const kappa = t * t; // Parabolic (∫κ ds = s²)
+      const gx = margin + t * (W - 2 * margin);
+      const gy = H * 0.85 - kappa * H * 0.3;
+      i === 0 ? ctx.moveTo(gx, gy) : ctx.lineTo(gx, gy);
+    }
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Label
+    ctx.font = '300 10px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(106, 154, 184, 0.4)';
+    ctx.textAlign = 'left';
+    ctx.fillText('κ(s) = 2s', margin, H * 0.88);
+    ctx.textAlign = 'right';
+    ctx.fillText('cumulative turning = s²', W - margin, H * 0.88);
+
+    // Render each character with curvature-mapped typography
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+
+      // s² curvature profile (matching the Euler spiral's cumulative turning)
+      const kappa = t * t;
+
+      // Weight: 300 → 900
+      const weight = Math.round(300 + 600 * kappa * wMap);
+      // Size: baseSize → baseSize * 1.5
+      const size = baseSize * (1 + kappa * 0.5 * sMap);
+      // Letter spacing: loose → tight
+      const spacing = 4 * (1 - kappa * spMap);
+      // Color: cool → warm
+      const hue = 200 - kappa * 20;
+      const lightness = 65 + kappa * 15;
+      const alpha = 0.4 + kappa * 0.6;
+
+      // Determine closest available weight
+      const fontWeight = weight <= 350 ? 300 : weight <= 450 ? 400 : weight <= 550 ? 500 : weight <= 650 ? 600 : weight <= 750 ? 700 : 800;
+
+      ctx.font = `${fontWeight} ${size}px "DM Sans", sans-serif`;
+      ctx.fillStyle = `hsla(${hue}, 70%, ${lightness}%, ${alpha})`;
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+
+      // Wrap to next line
+      const charW = ctx.measureText(chars[i]).width;
+      if (x + charW > W - margin) {
+        x = margin;
+        y += baseSize * 1.8;
+      }
+
+      ctx.fillText(chars[i], x, y);
+      x += charW + spacing;
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ SECTION 4: DROSTE TEXT ═══
+(function() {
+  const canvas = document.getElementById('drosteTextCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+
+  const drosteText = 'A picture of a gallery containing a picture of a gallery containing a picture of a gallery containing';
+
+  function draw() {
+    ctx.fillStyle = '#0a1628';
+    ctx.fillRect(0, 0, W, H);
+    const t = performance.now() / 1000;
+
+    const levels = parseInt(document.getElementById('drosteLevels').value);
+    const rot = parseFloat(document.getElementById('drosteRot').value);
+    const scaleFactor = parseFloat(document.getElementById('drosteScale').value);
+
+    for (let level = 0; level < levels; level++) {
+      const s = Math.pow(scaleFactor, level);
+      const angle = rot * level + t * 0.15 * (level + 1) * 0.3;
+      const fontSize = Math.max(4, 16 * s);
+      const alpha = Math.max(0.1, 1 - level * 0.12);
+      const hue = 200 + level * 15;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+
+      // Draw a frame
+      const frameW = 320 * s;
+      const frameH = 260 * s;
+      ctx.strokeStyle = `hsla(${hue}, 60%, 55%, ${alpha * 0.5})`;
+      ctx.lineWidth = Math.max(0.5, 2 * s);
+      ctx.strokeRect(-frameW / 2, -frameH / 2, frameW, frameH);
+
+      // Fill text inside frame, wrapping manually
+      ctx.font = `400 ${fontSize}px "DM Sans", sans-serif`;
+      ctx.fillStyle = `hsla(${hue}, 70%, 70%, ${alpha * 0.8})`;
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'left';
+
+      if (fontSize >= 5) {
+        const padding = 10 * s;
+        const maxW = frameW - 2 * padding;
+        const lineH = fontSize * 1.5;
+        let lineX = -frameW / 2 + padding;
+        let lineY = -frameH / 2 + padding;
+
+        // Simple word-wrap (like pretext's layout but simplified)
+        const words = drosteText.split(' ');
+        let line = '';
+
+        for (let wi = 0; wi < words.length; wi++) {
+          const testLine = line ? line + ' ' + words[wi] : words[wi];
+          const testW = ctx.measureText(testLine).width;
+          if (testW > maxW && line) {
+            ctx.fillText(line, lineX, lineY);
+            line = words[wi];
+            lineY += lineH;
+            if (lineY > frameH / 2 - padding) break;
+          } else {
+            line = testLine;
+          }
+        }
+        if (lineY <= frameH / 2 - padding) {
+          ctx.fillText(line, lineX, lineY);
+        }
+      }
+
+      // Label the level
+      ctx.font = `500 ${Math.max(4, 8 * s)}px "JetBrains Mono", monospace`;
+      ctx.fillStyle = `hsla(${hue}, 80%, 60%, ${alpha * 0.6})`;
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(`level ${level}`, frameW / 2 - 4 * s, frameH / 2 - 4 * s);
+
+      ctx.restore();
+    }
+
+    // Center glow
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 40);
+    g.addColorStop(0, 'rgba(255, 107, 107, 0.15)');
+    g.addColorStop(1, 'rgba(255, 107, 107, 0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx, cy, 40, 0, Math.PI * 2); ctx.fill();
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ SECTION 5: TEXT FLOWING AROUND THE SPIRAL ═══
+(function() {
+  const canvas = document.getElementById('flowTextCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const article = `The Euler spiral — also known as the Cornu spiral or clothoid — is defined by the Fresnel integral ∫₀ˢ e^(it²) dt. Its defining property is that curvature increases linearly with arc length: κ = 2s. At the origin, the curve is essentially straight. As you travel along it, it bends more and more — not in jumps, but in perfect proportion to distance traveled.
+
+This property makes it invaluable in civil engineering. When you drive onto a highway on-ramp, you don't want to go from a straight road to a sharp curve instantly. The clothoid transition eases you in, matching the natural rate at which a driver turns the steering wheel.
+
+But the Euler spiral is also a conformal map — it sends the real line into C via the Fresnel integral, preserving angles locally. This connects it to the whole world of complex analysis: the exponential map e^z that turns strips into annuli, the logarithm that unrolls circles into lines, and the remarkable mathematics behind Escher's Print Gallery.
+
+De Smit and Lenstra showed that Escher's self-referential artwork lives on a quotient of the complex plane: C*/⟨q⟩ for a specific complex number q. The "missing" center of Escher's piece can be filled by a conformal map that continues the spiral structure into the gap. The same mathematical machinery — conformal maps, complex exponentials, the Droste effect — connects highway design to recursive art.
+
+In the 37∞ framework, the Euler spiral embodies deliberate acceleration. Not the explosive exponential, but the steady linear increase. Each step adds the same increment of turning. Early on, the curve barely bends — you're building foundation. But the structure of acceleration is already embedded. Patience and momentum aren't opposites. They're the same curve.`;
+
+  function draw() {
+    ctx.fillStyle = '#0a1628';
+    ctx.fillRect(0, 0, W, H);
+
+    const spiralScale = parseFloat(document.getElementById('flowSize').value);
+    const lineH = parseFloat(document.getElementById('flowLH').value);
+    const fontSize = lineH * 0.68;
+    const margin = 50;
+    const textW = W - 2 * margin;
+
+    // Pre-compute spiral points for hit testing
+    const spiralPts = [];
+    const spiralN = 500;
+    const sMax = 6;
+    for (let i = 0; i <= spiralN; i++) {
+      const s = (i / spiralN) * sMax;
+      const [px, py] = fresnelPoint(s);
+      spiralPts.push({
+        x: W * 0.62 + px * spiralScale,
+        y: H * 0.35 - py * spiralScale
+      });
+    }
+    // Negative side
+    const spiralPtsNeg = [];
+    for (let i = 0; i <= spiralN; i++) {
+      const s = -(i / spiralN) * sMax;
+      const [px, py] = fresnelPoint(s);
+      spiralPtsNeg.push({
+        x: W * 0.62 + px * spiralScale,
+        y: H * 0.35 - py * spiralScale
+      });
+    }
+
+    // Draw the spiral
+    ctx.globalAlpha = 0.25;
+    [spiralPts, spiralPtsNeg].forEach(pts => {
+      ctx.beginPath();
+      pts.forEach((p, i) => {
+        i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+      });
+      const grad = ctx.createLinearGradient(pts[0].x, pts[0].y, pts[pts.length-1].x, pts[pts.length-1].y);
+      grad.addColorStop(0, '#00d4ff');
+      grad.addColorStop(1, '#ff6b6b');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    // For each text line, find the spiral's x-interval at that y
+    function getSpiralXIntervalAtY(y, buffer) {
+      buffer = buffer || 12;
+      let minX = Infinity, maxX = -Infinity;
+      let found = false;
+
+      [spiralPts, spiralPtsNeg].forEach(pts => {
+        for (let i = 0; i < pts.length; i++) {
+          if (Math.abs(pts[i].y - y) < lineH * 0.6) {
+            minX = Math.min(minX, pts[i].x);
+            maxX = Math.max(maxX, pts[i].x);
+            found = true;
+          }
+        }
+      });
+
+      if (!found) return null;
+      return [minX - buffer, maxX + buffer];
+    }
+
+    // Flow text line by line, carving around spiral
+    ctx.font = `300 ${fontSize}px "DM Sans", sans-serif`;
+    ctx.fillStyle = 'rgba(200, 230, 255, 0.75)';
+    ctx.textBaseline = 'top';
+
+    const words = article.split(/(\s+)/);
+    let wordIdx = 0;
+    let y = margin;
+
+    while (y < H - margin && wordIdx < words.length) {
+      const lineY = y + lineH * 0.15;
+      const interval = getSpiralXIntervalAtY(y + lineH / 2);
+
+      // Determine available line segments
+      let segments;
+      if (interval && interval[0] < W - margin && interval[1] > margin) {
+        // Split line into left and right segments around spiral
+        segments = [];
+        if (interval[0] > margin + 40) {
+          segments.push({ x: margin, w: interval[0] - margin });
+        }
+        if (interval[1] < W - margin - 40) {
+          segments.push({ x: interval[1], w: W - margin - interval[1] });
+        }
+      } else {
+        segments = [{ x: margin, w: textW }];
+      }
+
+      // Fill each segment with words
+      for (const seg of segments) {
+        let lineText = '';
+        let lineWidth = 0;
+        const segStartIdx = wordIdx;
+
+        while (wordIdx < words.length) {
+          const word = words[wordIdx];
+          if (word === '\n\n' || word === '\n') {
+            wordIdx++;
+            break;
+          }
+          const testText = lineText + word;
+          const testW = ctx.measureText(testText).width;
+          if (testW > seg.w && lineText.length > 0) break;
+          lineText += word;
+          lineWidth = ctx.measureText(lineText).width;
+          wordIdx++;
+        }
+
+        if (lineText.trim()) {
+          ctx.fillText(lineText.trim(), seg.x, lineY);
+        }
+      }
+
+      y += lineH;
+    }
+
+    // Don't animate - static is fine for text layout
+  }
+  draw();
+
+  // Redraw on slider change
+  ['flowSize', 'flowLH'].forEach(id => {
+    document.getElementById(id).addEventListener('input', draw);
+  });
+})();
+</script>
+</body>
+</html>

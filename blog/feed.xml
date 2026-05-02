@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <title>Blog</title>
+  <subtitle>Notes and short posts.</subtitle>
+  <link href="https://aculich.github.io/blog/feed.xml" rel="self" />
+  <link href="https://aculich.github.io/blog/" />
+  <updated>2026-05-01T00:00:00Z</updated>
+  <id>https://aculich.github.io/blog/</id>
+  <author>
+    <name>Aaron Culich</name>
+  </author>
+  <entry>
+    <title>Where work stalls</title>
+    <link href="https://aculich.github.io/blog/2026/05/01/where-work-stalls/" />
+    <updated>2026-05-01T00:00:00Z</updated>
+    <id>https://aculich.github.io/blog/2026/05/01/where-work-stalls/</id>
+    <content type="html">&lt;h1&gt;Where work stalls&lt;/h1&gt;
+&lt;p&gt;Where initiatives stagnate is almost always the human-to-human layer.&lt;/p&gt;
+&lt;p&gt;People freeze, not just slow down, in the face of systems they feel they cannot control.&lt;/p&gt;
+&lt;p&gt;Listening restores &lt;strong&gt;personal agency&lt;/strong&gt; → &lt;strong&gt;team agency&lt;/strong&gt; → &lt;strong&gt;systemic response.&lt;/strong&gt;&lt;/p&gt;
+</content>
+  </entry>
+</feed>

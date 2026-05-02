@@ -1,0 +1,37 @@
+---json
+{
+  "permalink": "/feed.xml",
+  "eleventyExcludeFromCollections": true,
+  "metadata": {
+    "title": "Blog",
+    "description": "Notes and short posts.",
+    "language": "en",
+    "base": "https://aculich.github.io/blog",
+    "author": {
+      "name": "Aaron Culich"
+    }
+  }
+}
+---
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{{ metadata.language or page.lang }}">
+  <title>{{ metadata.title }}</title>
+  <subtitle>{{ metadata.description }}</subtitle>
+  <link href="{{ metadata.base }}/feed.xml" rel="self" />
+  <link href="{{ metadata.base }}/" />
+  <updated>{{ collections.posts | getNewestCollectionItemDate | dateToRfc3339 }}</updated>
+  <id>{{ metadata.base }}/</id>
+  <author>
+    <name>{{ metadata.author.name }}</name>
+  </author>
+  {%- for post in collections.posts %}
+  {%- set absolutePostUrl = metadata.base + post.url %}
+  <entry>
+    <title>{{ post.data.title }}</title>
+    <link href="{{ absolutePostUrl }}" />
+    <updated>{{ post.date | dateToRfc3339 }}</updated>
+    <id>{{ absolutePostUrl }}</id>
+    <content type="html">{{ post.content | renderTransforms(post.data.page, metadata.base + "/") }}</content>
+  </entry>
+  {%- endfor %}
+</feed>

@@ -1,0 +1,12 @@
+---
+layout: base.njk
+title: Blog
+description: Notes and short posts.
+permalink: /index.html
+---
+<h1 class="mono" style="font-size:1.25rem;margin-bottom:1.5rem;">{{ title }}</h1>
+<ul class="mono" style="list-style:none;padding:0;margin:0;line-height:1.8;">
+{% for post in collections.posts %}
+  <li><a href="{{ post.url | sitePostUrl }}">{{ post.data.title }}</a> <span style="opacity:0.65;">— {{ post.date | dateDay }}</span></li>
+{% endfor %}
+</ul>

@@ -1,0 +1,33 @@
+# Snapshot of GitHub repository + GitHub Pages settings (no secrets).
+# Regenerate after changing Pages or repo metadata:
+#   gh api repos/aculich/aculich.github.io/pages --jq . | tee /tmp/pages.json
+#   gh repo view aculich/aculich.github.io --json name,description,homepageUrl,defaultBranchRef,isPrivate,visibility,url
+#
+# Safe to commit: excludes tokens; cname may appear if you add a custom domain.
+
+generated_at: "2026-05-02T03:51:03Z" # update when refreshing this file
+
+repository:
+  name: aculich.github.io
+  full_name: aculich/aculich.github.io
+  url: https://github.com/aculich/aculich.github.io
+  description: My blog and musings
+  homepage_url: https://aculich.github.io/
+  visibility: PUBLIC
+  is_private: false
+  default_branch: main
+
+pages:
+  api_url: https://api.github.com/repos/aculich/aculich.github.io/pages
+  html_url: https://aculich.github.io/
+  status: built
+  build_type: legacy
+  public: true
+  https_enforced: true
+  custom_404: false
+  cname: null
+  protected_domain_state: null
+  pending_domain_unverified_at: null
+  source:
+    branch: main
+    path: /

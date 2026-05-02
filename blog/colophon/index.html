@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ site.language }}">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% if title %}{{ title }} — {% endif %}{{ site.title }}</title>
-  {% if description %}<meta name="description" content="{{ description }}" />{% endif %}
+  <title>Colophon — Phase Shift</title>
+  <meta name="description" content="Behind the scenes — the tools, workflows, and components used to write, assemble, and publish this blog." />
   <link rel="stylesheet" href="/style.css" />
   <style>
     /* ── layout ─────────────────────────────────────── */
@@ -134,7 +134,148 @@
       <a href="/blog/feed.xml">RSS</a>
       <a href="/blog/posts.json">JSON</a>
     </nav>
-    {{ content | safe }}
+    <article class="blog-post">
+<h1>Colophon</h1>
+<blockquote>
+<p><em>Behind the scenes — the tools, workflows, and components used to write, assemble, and publish this blog.</em></p>
+</blockquote>
+<p>This page is intentionally short today. What is listed below is <strong>what is actually in use right now</strong> to write and ship these posts. Over time, as I release the components, prompts, and methods I use as open source, this page will grow into a full inventory: not only the <em>publishing</em> system, but how the underlying <em>content</em> gets researched, drafted, listened-into, edited, and assembled before it ever reaches the publisher.</p>
+<p>If you are reading this and the page is still short, that is honest, not a bug. Inspired in spirit by <a href="https://tools.simonwillison.net/colophon">Simon Willison's colophon</a>.</p>
+<hr>
+<h2 id="bespoke-tools-methods" tabindex="-1">Bespoke Tools &amp; Methods</h2>
+<table>
+<thead>
+<tr>
+<th>Method / Tool</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deep Listening methodology and agents</td>
+<td>Coming soon at <a href="https://DeeperListening.AI/">DeeperListening.AI</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="ai-development-tools" tabindex="-1">AI development tools</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cursor</td>
+<td>AI-native code editor. Where the writing, editing, and template work happens.</td>
+</tr>
+<tr>
+<td>Claude Cowork</td>
+<td>Anthropic's AI assistant. Used as a drafting partner, editor, and reviewer, and filesystem speleunker, context &amp; intent gatherer.</td>
+</tr>
+<tr>
+<td>Opus 4.7</td>
+<td>The specific Claude large language model (LLM) by Anthropic in active use for the co-writing on this site.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="development-environment" tabindex="-1">Development environment</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cursor</td>
+<td>Primary editor (see above).</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>Version control for every word and template change.</td>
+</tr>
+<tr>
+<td>GitHub</td>
+<td>Where the repository lives.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="static-site-generation" tabindex="-1">Static site generation</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Eleventy (11ty)</td>
+<td>Static site generator. Takes the markdown in <code>content/blog/</code> and turns it into the HTML you are reading.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment-hosting" tabindex="-1">Deployment &amp; hosting</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GitHub Pages</td>
+<td>Serves the built site.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="community-engagement" tabindex="-1">Community &amp; engagement</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>(to come)</em></td>
+<td>Components for community engagement will be listed here as they are released as open source.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seo-marketing" tabindex="-1">SEO &amp; marketing</h2>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>(to come)</em></td>
+<td>Components for distribution and discoverability will be listed here as they are released as open source.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="what-this-page-will-become" tabindex="-1">What this page will become</h2>
+<p>The deeper purpose of this colophon is to make the <em>production process</em> of the writing itself legible — not only the publishing chain. As I release them, expect entries on:</p>
+<ul>
+<li>the listening-and-capture method that produces the raw material of these essays;</li>
+<li>the prompts, rubrics, and <code>.context/</code> artifacts used to draft, critique, and revise them;</li>
+<li>the workflow scripts (post staging, draft pools, the blog-publish loop) that move a piece from a working note to a published post;</li>
+<li>the editorial discipline of working with a model like Claude Opus 4.7 in a way that preserves voice rather than flattening it.</li>
+</ul>
+<p>Each piece will land on this page as it goes open. <strong>If a tool is named here, it is in use today. If it is not named, it either does not exist yet or has not been released yet.</strong></p>
+
+</article>
+
   </div>
 </body>
 </html>

@@ -7,122 +7,11 @@
   <meta name="description" content="AI&#39;s first institutional job is not to answer. It is to listen with purpose so that the judgment that makes science and civic systems work has somewhere to live before the people who hold it leave the room." />
   <link rel="stylesheet" href="/style.css" />
   <style>
-    /* ── layout ─────────────────────────────────────── */
-    .blog-wrap {
-      max-width: 42rem;
-      margin: 0 auto;
-      padding: 2rem 1.25rem 4rem;
-    }
-    /* On wider screens, give the column a modest bump so multi-column
-       tables breathe without pushing prose past a comfortable measure. */
-    @media (min-width: 64rem) {
-      .blog-wrap { max-width: 50rem; }
-    }
-
+    .blog-wrap { max-width: 42rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
     .blog-nav { margin-bottom: 2rem; font-size: 0.9rem; }
     .blog-nav a { color: inherit; margin-right: 1rem; }
-
-    /* ── headings & prose ───────────────────────────── */
-    .blog-post h1 {
-      font-size: 1.85rem;
-      line-height: 1.2;
-      margin: 0 0 1.25rem;
-    }
-    .blog-post h2 {
-      font-size: 1.35rem;
-      line-height: 1.3;
-      margin: 2.5rem 0 0.85rem;
-      padding-top: 0.25rem;
-    }
-    .blog-post h3 {
-      font-size: 1.1rem;
-      line-height: 1.35;
-      margin: 1.75rem 0 0.6rem;
-    }
-    .blog-post p { line-height: 1.65; margin: 0 0 1rem; }
-
-    /* ── lists ──────────────────────────────────────── */
-    .blog-post ul,
-    .blog-post ol {
-      margin: 0 0 1.25rem;
-      padding-left: 1.5rem;
-      line-height: 1.65;
-    }
-    .blog-post li { margin-bottom: 0.4rem; }
-    .blog-post li > p { margin-bottom: 0.4rem; }
-
-    /* ── blockquote ─────────────────────────────────── */
-    .blog-post blockquote {
-      margin: 1.5rem 0;
-      padding: 0.25rem 0 0.25rem 1.1rem;
-      border-left: 3px solid var(--accent, #5a7247);
-      color: var(--muted, #6a5e4d);
-    }
-    .blog-post blockquote p { margin-bottom: 0.6rem; }
-    .blog-post blockquote p:last-child { margin-bottom: 0; }
-
-    /* ── horizontal rule ────────────────────────────── */
-    .blog-post hr {
-      border: 0;
-      border-top: 1px solid var(--card-border, rgba(0,0,0,0.12));
-      margin: 2.25rem 0;
-    }
-
-    /* ── inline code ────────────────────────────────── */
-    .blog-post code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.9em;
-      background: rgba(var(--text-rgb, 39, 26, 0), 0.06);
-      padding: 0.1em 0.35em;
-      border-radius: 3px;
-    }
-
-    /* ── images ─────────────────────────────────────── */
-    .blog-post img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 1.5rem auto;
-    }
-
-    /* ── tables ─────────────────────────────────────── */
-    /* Wrap the whole table block so it can scroll horizontally on narrow
-       screens instead of overflowing the column. Markdown emits a bare
-       <table>; this rule treats the table itself as the scroll container. */
-    .blog-post table {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      overflow-x: auto;
-      border-collapse: collapse;
-      margin: 1.5rem 0 2rem;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-    .blog-post thead {
-      border-bottom: 2px solid var(--accent, #5a7247);
-    }
-    .blog-post th,
-    .blog-post td {
-      padding: 0.65rem 0.85rem;
-      text-align: left;
-      vertical-align: top;
-      border-bottom: 1px solid var(--card-border, rgba(0,0,0,0.1));
-    }
-    .blog-post th {
-      font-weight: 600;
-      color: var(--text, inherit);
-    }
-    .blog-post tbody tr:last-child td { border-bottom: 0; }
-    .blog-post tbody tr:nth-child(even) td {
-      background: rgba(var(--text-rgb, 39, 26, 0), 0.025);
-    }
-
-    /* ── links ──────────────────────────────────────── */
-    .blog-post a {
-      color: var(--accent, #5a7247);
-      text-underline-offset: 2px;
-    }
+    .blog-post h1 { font-size: 1.75rem; margin-bottom: 1rem; }
+    .blog-post p { line-height: 1.6; margin: 0 0 1rem; }
   </style>
 </head>
 <body>
@@ -130,7 +19,6 @@
     <nav class="blog-nav mono">
       <a href="/">Home</a>
       <a href="/blog/">Blog</a>
-      <a href="/blog/colophon/" title="Behind the scenes">Colophon</a>
       <a href="/blog/feed.xml">RSS</a>
       <a href="/blog/posts.json">JSON</a>
     </nav>
@@ -151,7 +39,7 @@
 <p>The AquiLLM paper proposes a retrieval system to surface that tacit knowledge once it has been written down somewhere. This essay is about the step before retrieval: how to <em>get the knowledge written down at all</em>, while the people who hold it are still in the room. <strong>AI's first institutional job is not to answer. It is to listen with purpose, so that the judgment that makes a system work has somewhere durable to live before the people who hold it disappear.</strong></p>
 <p>That is the worldview shift this essay is asking you to consider.</p>
 <hr>
-<h2 id="the-shift-this-essay-proposes" tabindex="-1">The shift this essay proposes</h2>
+<h2>The shift this essay proposes</h2>
 <table>
 <thead>
 <tr>
@@ -180,7 +68,7 @@
 </table>
 <p>The first three shifts are partly already in the air: Jennifer Pahlka has named the <em>project vs. product funding</em> trap; Seemay Chou has argued that <em>publishing defines science</em>; Doris Tsao's discipline is that the test of understanding is <em>writing into</em> the system, not only <em>reading from</em> it. Eli Dourado's frame for the post-1973 productivity stall is structurally the same: <em>concrete vision → identify the obstacle → use entrepreneurial will to obliterate the obstacle.</em> The fourth row, <em>institutional memory as civic infrastructure</em>, is what this essay is contributing.</p>
 <hr>
-<h2 id="why-ordinary-instruments-dont-reach-the-bottleneck" tabindex="-1">Why ordinary instruments don't reach the bottleneck</h2>
+<h2>Why ordinary instruments don't reach the bottleneck</h2>
 <p>The instruments we already have, at industrial maturity, can do many things. They cannot do this thing.</p>
 <ul>
 <li><strong>Quantitative dashboards</strong> aggregate the legible. They cannot capture the question that should have been asked, the half-formed objection no one wrote down, or the codebook key that lives inside an undocumented field labelled <code>9999</code>.</li>
@@ -193,7 +81,7 @@
 <p>In plain language, this is <strong>Deep Listening</strong>: a structured pairing of human-to-human conversation with AI that holds the listening load. A facilitator (or a colleague, or a peer) sits with the person whose judgment the system depends on. The two of them talk. The AI does not interrupt, does not summarize, does not generate answers. It listens against a named rubric: <em>what is this person's project, what does good look like for it, what values must hold, who needs the output, in their own voice.</em> It produces durable artifacts the next session, the next colleague, and the next agent can actually use: workflow maps, decision logs, open-question logs, voice-and-vocabulary lexicons, and small <code>.context/</code> directories. By <code>.context/</code>, I mean a version-controlled folder that travels with a project, holding the judgment layer around the work rather than the work itself.</p>
 <p>The name is plain. The discipline is what makes it new.</p>
 <hr>
-<h2 id="what-listening-is-not" tabindex="-1">What listening is <em>not</em></h2>
+<h2>What listening is <em>not</em></h2>
 <p>This only works if the people being listened to retain agency over what is captured, how it is interpreted, who can access it, and how it is used. <strong>An instrument that becomes surveillance has failed before it begins.</strong> Six guardrails, written into the method, before any session runs:</p>
 <ul>
 <li><em>Steward, not user.</em> Communities and individuals retain authority and ethical claims over data about them; the data consumer holds responsibility on their behalf. (CARE Principles for Indigenous Data Governance.)</li>
@@ -205,25 +93,25 @@
 </ul>
 <p>These are not decorative. They are the operating boundary of the method, and they are why this can be listening as instrumentation rather than listening as surveillance.</p>
 <hr>
-<h2 id="three-places-the-method-already-runs" tabindex="-1">Three places the method already runs</h2>
+<h2>Three places the method already runs</h2>
 <p>The method is not a proposal. It is a discipline that has been deployed across several domains and tested in the wild. Three of them are vivid enough to walk a reader through.</p>
-<h3 id="1-rapid-reviews-infectious-diseases-the-science-side-deployment" tabindex="-1">1. Rapid Reviews / Infectious Diseases: the science-side deployment</h3>
+<h3>1. Rapid Reviews / Infectious Diseases: the science-side deployment</h3>
 <p>During an outbreak, methodologically qualified expertise must find the right preprint within days, anywhere in the world, without quietly defaulting to the same fifty people in everyone's rolodex. Rapid Reviews / Infectious Diseases is an open-access overlay journal jointly run by MIT Press and the UC Berkeley School of Public Health. Over two years it has moved more than thirty undergraduate STEM students plus medical and public-health graduate students through a global review program, with a faculty editorial team across the United States, India, and beyond. The journal exists; the reviewers exist; the science is real.</p>
 <p>What does not yet exist, anywhere in scholarly publishing, is a workflow that captures <em>what each reviewer reads for</em> across successive engagements: the methodological-competence rubric kept in their heads. Deep Listening builds that rubric session by session, in the reviewer's own voice, with the reviewer's own examples, into a <code>.context/</code> artifact a successor can read. The deeper move, named by the RR/ID team itself, is that the work is not just infrastructure but <em>conditions that allow others to build further</em>: a help-desk and ticketing layer that turned person-dependent support into something the next cohort of students can run; a culture in which a student's question gets met with <em>what is your goal</em> before <em>here is the fix</em>. That is the shape of metascience that scales: the platform plus the next cohort of practitioners trained inside it.</p>
-<h3 id="2-the-california-research-bureau-and-the-clearing-account-the-civic-policy-deployment" tabindex="-1">2. The California Research Bureau and the clearing account: the civic-policy deployment</h3>
+<h3>2. The California Research Bureau and the clearing account: the civic-policy deployment</h3>
 <p>California's Open Fi$Cal data is technically public. Interpreting it is not. In one fiscal year alone, <strong>18,995 expenditures</strong> parsed; <strong>9,425</strong> matched to authorizing texts; <strong>9,491</strong> routed to a single clearing account that everyone in the budget shop knows about and almost no public artifact mentions. Without a CA State fiscal analyst who has worked with that system for a decade, the published numbers would be <em>numerically right and easy to mis-story</em>. That phrase is the whole essay in miniature: data access is not the same as public intelligibility, and tacit knowledge is the difference.</p>
 <p>The CRB Nexus three-part workshop series ran February through April 2026. Roughly seventy registered, thirty live each session. A non-programmer staff member built a working AI agent to verify provenance chains in legislative research. Another built a workflow-mapping prototype for a recurring newsletter. Both shipped because the listening surfaced the staff's values — accuracy, nonpartisan rigor, transparency — <em>before</em> the prompts. The artifact a successor agency analyst (at LAO, ODI, or the Senate Office of Research) can adopt is a <code>.context/</code> substrate: not a franchise, a starter culture.</p>
 <p>But the artifact itself is not the deepest impact. <strong>The real transformation was what shifted for the people in the room.</strong> As Tonya, a staff member, described during the process, the act of being listened to—having to articulate her decisions, caveats, and the tacit insights she’d never previously voiced—changed how she related to her own work. This process required <em>Deep Speaking</em>: making the invisible aspects of expertise explicit, in her own words. The relief was palpable; she could participate fully in the conversation, knowing the responsibility of detailed note-taking was handled by the AI. The listening load was lifted. The next session could begin with shared context; decisions and reasoning weren’t lost. Two participants could <em>talk and actually be heard</em> in a way traditional note-taking never allowed. <a href="https://youtu.be/7A1vVkfz_tE?si=6MMx0P0xdU2SMNTj&amp;t=2302">See Tonya discuss this shift</a>.</p>
-<h3 id="3-the-civic-legal-aid-deployment-scaled-from-city-to-federal" tabindex="-1">3. The civic-legal-aid deployment, scaled from city to federal</h3>
+<h3>3. The civic-legal-aid deployment, scaled from city to federal</h3>
 <p>Eviction filings, sheriff writs, court dispositions, and housing-precarity risk indicators are technically queryable. Whether the case-management system can track address, whether a model trained on 2019 data still flags a community whose displacement intensified in 2022, whether a city qualifies for adaptation funding because of an indicator embedded in a state GIS platform: each of these depends on tacit knowledge no public artifact carries. The interpretive bottleneck is not the data. It is the institutional history of why a system measures what it measures, and what it leaves out.</p>
 <p>The deployment runs across five rungs of the same instrument: a single neighborhood vulnerability assessment whose locally-known precarity is <em>not</em> flagged by the conservative national risk model; a county-by-county housing-element analysis serving twenty-one cities under a single county umbrella; a county courts report partner-mediated by Legal Aid and the county Community Development Agency; a state-level housing-precarity model embedded in California's coastal-adaptation GIS platform as one of the indicators that determine funding eligibility under SB 272; and federal connections through HUD AFFH and the National Academies' COVID-era eviction work. The same method runs at every scale. The civil-legal-aid sector frames the public-value case directly: independent state studies report ratios on the order of $7 in benefits per $1 invested, and a single regional legal-aid organization reports more than $50M in direct economic benefits returned to families in a single year. The bottleneck has never been the value of the work. It has always been the institutional listening that lets the work compound.</p>
 <hr>
-<h2 id="what-these-three-places-share" tabindex="-1">What these three places share</h2>
+<h2>What these three places share</h2>
 <p>In each case, the breakthrough that science-and-civic infrastructure needs is not a paper, a grant, or a policy memo. It is <strong>a piece of operational infrastructure built by people who understood the bottleneck from the inside</strong>, with an instrumented workflow that survives the people who built it. The Protein Data Bank, arXiv, and Focused Research Organizations are the canonical scientific examples. Each turned a recurring informal practice into shared infrastructure: deposition, circulation, coordination. Deep Listening attempts the same move for <em>tacit judgment</em>, and it does so across science <em>and</em> the civic systems science is embedded in.</p>
 <p>The frame that makes this legible is not new. <em>Concrete vision → identify the obstacles → entrepreneurial will to obliterate the obstacles</em> is the recipe Eli Dourado has been articulating for the post-1973 productivity stall. The argument here is structurally identical. Ideas are not the binding constraint. Capability is not the binding constraint. The institutional listening that lets ideas and capability compound <em>is</em> the constraint. Build that, and the pace of useful science and useful civic action both move at once.</p>
 <p>The general public is not a respondent in this design. They are <em>first-person experts</em> on what their own lives, families, and communities experienced. A resident whose neighborhood is invisible to a national risk model is not anecdotal noise. She is evidence that the model may be missing the thing policy most needs to see. The instrument treats her that way.</p>
 <hr>
-<h2 id="the-hypothesis-with-baselines" tabindex="-1">The hypothesis, with baselines</h2>
+<h2>The hypothesis, with baselines</h2>
 <p>Three claims, each willing to be wrong out loud. Each specifies <em>baseline against what, graded by whom</em>.</p>
 <table>
 <thead>
@@ -261,18 +149,17 @@
 </table>
 <p>What would tell me the hypothesis is wrong: a deployment that completes the full method cycle and <em>still</em> produces outputs the domain experts will not vouch for. An <em>informative</em> failure would isolate which layer broke (the trust substrate, the theoretical frame, the listening protocol, the capture pipeline, or the artifact specification) and would itself be a metascience finding worth publishing in the open by default.</p>
 <hr>
-<h2 id="what-is-actually-at-stake" tabindex="-1">What is actually at stake</h2>
+<h2>What is actually at stake</h2>
 <p>Tom Negrete is the director of the California Research Bureau. Before the listening sessions began, he and his staff were stuck. Not slow. Stuck. AI was overwhelming. The cadence of change was overwhelming. The forecast for state agencies was overwhelming. Their response, a year ago, was paralysis dressed as professional caution.</p>
 <p>A year of <em>talking and listening together</em> accomplished what no purely technical solution could. Tom shared: <em>we used to be paralyzed. Now we aren't. We have language for our work. We have artifacts our colleagues can reference. Our knowledge and judgment persist beyond staff turnover.</em> He added, more softly: <em>my peers at other agencies who didn't have these conversations remain where we were a year ago.</em><br>
 <a href="https://youtu.be/7A1vVkfz_tE?si=4Wioz_FT3ODNU0TL&amp;t=369">Watch Tom discuss this transformation</a>.</p>
 <p>This is the part that does not show up in any falsifiability table. The instrument's first effect is not on the artifact. It is on the people in the conversation. <strong>When the AI takes the listening load, the humans can stop performing for the recorder and start being present for each other.</strong> The notes get taken. The decisions get logged. The next session walks in already knowing what was decided. <em>And</em> the participants do something they had quietly stopped doing under the weight of constant note-taking and meeting documentation: they hear each other.</p>
 <p>That is the deeper claim of this essay. Listening is not therapy and it is not surveillance. It is what becomes possible when the load of remembering shifts off the humans in the room and onto a tool that listens with purpose. Personal agency returns first. Team agency follows. Systemic response is what those two compound into.</p>
 <hr>
-<h2 id="the-ask" tabindex="-1">The ask</h2>
+<h2>The ask</h2>
 <p>Fund <strong>one year of structured listening in one bounded scientific or civic system</strong>. Publish the artifacts where possible. Protect what must be protected. Measure whether successors can act on them. Let domain experts grade the AI. Let the people whose judgment was captured tell us whether the artifacts represent them.</p>
 <p>The technology exists. The people exist. The method runs. The distance between the world where this is treated as institutional infrastructure and the world where it is not is <em>will</em>: the will to write down what we know before the people who know it leave; to treat the human-to-human layer as load-bearing rather than overhead; to keep showing up to the next conversation when the calendar tries to go quiet.</p>
 <p>Let's listen. Together.</p>
-<p><a href="/blog/colophon/#bespoke-tools-methods">DeeperListening.AI</a></p>
 <hr>
 <p>*Aaron Culich is an independent research-software engineer at CiDR Lab <a href="https://cidrlab.org/">https://cidrlab.org/</a> and mindfulness, emotional intelligence and listening trainer and facilitator at PEEQ.WORK <a href="https://peeq.work/">https://peeq.work/</a>. The deployments referenced run at varying status: Rapid Reviews / Infectious Diseases <a href="https://rrid.mitpress.mit.edu/">https://rrid.mitpress.mit.edu/</a> (in progress, MIT Press / UC Berkeley School of Public Health); CRB Nexus <a href="https://www.library.ca.gov/crb/nexus/">https://www.library.ca.gov/crb/nexus/</a> (workshops completed Feb–Apr 2026; MaCSS <a href="https://macss.berkeley.edu/">https://macss.berkeley.edu/</a> capstone completed May 1, 2026); the multi-scale civic-legal-aid program (CiDR Lab: city / county / state / federal).</p>
 

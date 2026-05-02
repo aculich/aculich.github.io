@@ -1,8 +1,26 @@
 const rssPlugin = require("@11ty/eleventy-plugin-rss");
+const markdownIt = require("markdown-it");
+const markdownItAnchor = require("markdown-it-anchor");
+
+/** GitHub-style slug: lowercase, strip punctuation, spaces -> hyphens. */
+function slugify(s) {
+  return String(s)
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
 
 /** @param {import("@11ty/eleventy").UserConfig} eleventyConfig */
 module.exports = function (eleventyConfig) {
   eleventyConfig.addPlugin(rssPlugin);
+
+  // Markdown engine with auto-generated heading IDs (so we can deep-link to sections).
+  const md = markdownIt({ html: true, linkify: true, typographer: false }).use(
+    markdownItAnchor,
+    { slugify, level: [2, 3, 4] }
+  );
+  eleventyConfig.setLibrary("md", md);
 
   eleventyConfig.addCollection("posts", (collectionApi) =>
     collectionApi.getFilteredByTag("posts").sort((a, b) => b.date - a.date)

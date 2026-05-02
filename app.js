@@ -556,12 +556,16 @@ function buildOSSGraph() {
 // NAV SCROLL STYLE
 // ─────────────────────────────────────────────────
 function initNavScroll() {
-  // Handled by onScroll — but also set up smooth scroll for nav links
+  // Handled by onScroll — but also set up smooth scroll for in-page #anchors only
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = document.querySelector(link.getAttribute('href'));
+      const href = link.getAttribute('href');
+      if (!href || href[0] !== '#') {
+        return;
+      }
+      const target = document.querySelector(href);
       if (target && lenis) {
+        e.preventDefault();
         lenis.scrollTo(target, { offset: -80 });
       }
     });

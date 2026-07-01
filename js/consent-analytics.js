@@ -74,6 +74,7 @@
       },
       type: "opt-in",
       position: "bottom",
+      static: true,
       content: {
         message:
           "This site uses cookies for anonymous analytics so I can see which pages help readers. No ads, no sale of personal data.",
@@ -81,16 +82,6 @@
         deny: "Decline",
         link: "Privacy",
         href: cfg.privacyPath || "/blog/privacy/",
-      },
-      law: {
-        regionalLaw: true,
-        countryCode: "US",
-      },
-      elements: {
-        allow:
-          "<a aria-label='Accept analytics cookies' role='button' tabindex='0' class='cc-btn cc-allow'>{{allow}}</a>",
-        deny:
-          "<a aria-label='Decline analytics cookies' role='button' tabindex='0' class='cc-btn cc-deny'>{{deny}}</a>",
       },
       onStatusChange: function (status) {
         if (status === "allow") grantAnalytics();
@@ -100,6 +91,14 @@
         if (status === "allow") grantAnalytics();
       },
     });
+  }
+
+  function scheduleBanner() {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initCookieBanner);
+    } else {
+      initCookieBanner();
+    }
   }
 
   function init() {
@@ -124,7 +123,7 @@
       return;
     }
 
-    window.addEventListener("load", initCookieBanner);
+    scheduleBanner();
   }
 
   init();

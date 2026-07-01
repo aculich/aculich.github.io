@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Phase Shift 37 infinity">
+  <rect width="32" height="32" rx="7" fill="#faf8f5"/>
+  <text x="4" y="21" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="700" fill="#5a7247">37</text>
+  <path d="M 19 16 C 19 13 21.5 12 22.5 14 C 23.5 16 23.5 16 22.5 18 C 21.5 20 19 19 19 16 Z M 27 16 C 27 13 24.5 12 23.5 14 C 22.5 16 22.5 16 23.5 18 C 24.5 20 27 19 27 16 Z" fill="none" stroke="#c4a35a" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

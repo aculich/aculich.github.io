@@ -74,7 +74,7 @@
       },
       type: "opt-in",
       position: "bottom",
-      static: true,
+      theme: "edgeless",
       content: {
         message:
           "This site uses cookies for anonymous analytics so I can see which pages help readers. No ads, no sale of personal data.",

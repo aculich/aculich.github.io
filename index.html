@@ -25,6 +25,16 @@
   <script src="/js/site-config.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
   <style>
+    /* Fixed bottom bar — opaque, never overlays fixed #nav */
+    .cc-window.cc-banner {
+      background-color: #faf8f5 !important;
+      color: #27201a !important;
+      opacity: 1 !important;
+      box-shadow: 0 -2px 20px rgba(39, 26, 0, 0.1);
+      border-top: 1px solid rgba(90, 114, 71, 0.2);
+    }
+    .cc-window.cc-banner .cc-message { color: #27201a !important; }
+    .cc-window, .cc-revoke { z-index: 10050 !important; }
     .cc-btn.cc-allow {
       background-color: #5a7247 !important;
       color: #ffffff !important;
@@ -40,7 +50,6 @@
       outline: 2px solid #ffffff !important;
       outline-offset: 2px !important;
     }
-    .cc-window, .cc-revoke { z-index: 2147483647 !important; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
   <script src="/js/consent-analytics.js"></script>

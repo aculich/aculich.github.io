@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "prebuild": "node scripts/generate-site-config.js",
     "build": "eleventy",
     "clean": "node -e \"require('fs').rmSync('blog',{recursive:true,force:true})\""
   },

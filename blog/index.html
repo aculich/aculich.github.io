@@ -124,6 +124,29 @@
       text-underline-offset: 2px;
     }
   </style>
+    <!-- Google Consent Mode v2 + Osano CookieConsent (see js/consent-analytics.js) -->
+  <script src="/js/site-config.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
+  <style>
+    .cc-btn.cc-allow {
+      background-color: #5a7247 !important;
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+    .cc-btn.cc-deny {
+      background-color: #666666 !important;
+      color: #ffffff !important;
+      font-weight: 600 !important;
+    }
+    .cc-btn:hover { opacity: 0.9 !important; }
+    .cc-btn:focus {
+      outline: 2px solid #ffffff !important;
+      outline-offset: 2px !important;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+  <script src="/js/consent-analytics.js"></script>
+
 </head>
 <body>
   <div class="blog-wrap">
@@ -131,6 +154,7 @@
       <a href="/">Home</a>
       <a href="/blog/">Blog</a>
       <a href="/blog/colophon/" title="Behind the scenes">Colophon</a>
+      <a href="/blog/privacy/">Privacy</a>
       <a href="/blog/feed.xml">RSS</a>
       <a href="/blog/posts.json">JSON</a>
     </nav>

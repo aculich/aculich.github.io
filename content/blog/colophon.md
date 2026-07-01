@@ -59,7 +59,10 @@ If you are reading this and the page is still short, that is honest, not a bug. 
 
 | Tool | Role |
 |---|---|
-| *(to come)* | Components for distribution and discoverability will be listed here as they are released as open source. |
+| Google Analytics 4 | Aggregate pageviews and referrers (opt-in only; Google Consent Mode v2). |
+| Cloudflare Web Analytics | Cookieless aggregate traffic (loaded only after analytics consent). |
+| Osano CookieConsent v3 | Open-source cookie banner; symmetrical Accept / Decline; honors Global Privacy Control. |
+| [Privacy policy](/blog/privacy/) | Cookies, analytics, CCPA/GDPR rights, and contact. |
 
 ---
 

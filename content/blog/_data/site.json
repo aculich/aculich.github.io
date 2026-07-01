@@ -3,5 +3,14 @@
   "title": "Phase Shift",
   "description": "Notes and short posts.",
   "author": "Aaron Culich",
-  "language": "en"
+  "language": "en",
+  "analytics": {
+    "ga4MeasurementId": "",
+    "cloudflareBeaconToken": ""
+  },
+  "consent": {
+    "privacyPath": "/blog/privacy/",
+    "accentColor": "#5a7247",
+    "denyButtonColor": "#666666"
+  }
 }
